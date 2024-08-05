@@ -1,8 +1,8 @@
 import {
-  AutoTokenizer,
+  AutoProcessor,
   CLIPVisionModelWithProjection,
   type PreTrainedModel,
-  type PreTrainedTokenizer,
+  type Processor,
 } from "@xenova/transformers";
 
 // Use the Singleton pattern to enable lazy construction of the pipeline.
@@ -10,12 +10,12 @@ import {
 const S = () =>
   class ApplicationSingleton {
     static model_id = "Xenova/clip-vit-base-patch16";
-    static tokenizer: Promise<PreTrainedTokenizer> | null = null;
+    static processor: Promise<Processor> | null = null;
     static vision_model: Promise<PreTrainedModel> | null = null;
 
     static async getInstance() {
-      if (this.tokenizer === null) {
-        this.tokenizer = AutoTokenizer.from_pretrained(this.model_id);
+      if (this.processor === null) {
+        this.processor = AutoProcessor.from_pretrained(this.model_id);
       }
 
       if (this.vision_model === null) {
@@ -27,7 +27,7 @@ const S = () =>
         );
       }
 
-      return Promise.all([this.tokenizer, this.vision_model]);
+      return Promise.all([this.processor, this.vision_model]);
     }
   };
 
@@ -43,4 +43,4 @@ if (process.env.NODE_ENV !== "production") {
 } else {
   ApplicationSingleton = S();
 }
-export default ApplicationSingleton;
+export default ApplicationSingleton as any;
