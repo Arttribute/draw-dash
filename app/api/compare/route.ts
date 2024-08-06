@@ -14,20 +14,24 @@ type Input = {
 
 export async function POST(request: Request) {
   try {
-    // const { query_image, ans_image }: Input = await request.json();
+    const formData = await request.formData();
 
-    // TODO: upload to bucket and get the URL
+    // Get the two images from the form data
+    const query_image = formData.get("query_image") as File;
+    const ans_image = formData.get("ans_image") as File;
+
+    // Create Blobs from the images
+    const query_image_blob = new Blob([query_image], {
+      type: query_image.type,
+    });
+    const ans_image_blob = new Blob([ans_image], { type: ans_image.type });
 
     const [processor, vision_model]: [Processor, PreTrainedModel] =
       await ApplicationSingleton.getInstance();
 
-    // Read the two images
-    const rawImageQuery = await RawImage.read(
-      "https://img.freepik.com/free-vector/grunge-floral-background_1048-7366.jpg?size=626&ext=jpg&ga=GA1.1.407704436.1720632020&semt=ais_hybrid"
-    );
-    const rawImageAns = await RawImage.read(
-      "https://img.freepik.com/free-photo/yellow-throated-sericornis-sericornis-citreogularis-illustrated-by-elizabeth-gould_53876-65174.jpg?size=626&ext=jpg&ga=GA1.1.407704436.1720632020&semt=sph"
-    );
+    // Read the two images as raw images
+    const rawImageQuery = await RawImage.fromBlob(query_image_blob);
+    const rawImageAns = await RawImage.fromBlob(ans_image_blob);
 
     // Tokenize the two images
     const tokenizedImageQuery = await processor(rawImageQuery);

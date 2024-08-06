@@ -7,13 +7,9 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
   const formData = new FormData(e.currentTarget);
 
-  const file = formData.get("query_image") as File;
-
   const res = await fetch("/api/compare", {
     method: "POST",
-    body: JSON.stringify({
-      query_image: URL.createObjectURL(file),
-    }),
+    body: formData,
   });
 
   const data = await res.json();
@@ -27,6 +23,7 @@ export default function Home() {
       <AccountMenu />
       <form onSubmit={handleSubmit}>
         <input type="file" accept="image/*" name="query_image" />
+        <input type="file" accept="image/*" name="ans_image" />
         <button type="submit">Submit</button>
       </form>
     </div>
