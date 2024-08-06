@@ -5,6 +5,7 @@ import {
   type Processor,
   RawImage,
 } from "@xenova/transformers";
+import { cosineSimilarity } from "./util";
 
 type Input = {
   query_image: string;
@@ -38,14 +39,14 @@ export async function POST(request: Request) {
     );
     const { image_embeds: embedsAns } = await vision_model(tokenizedImageAns);
 
-    // TODO: Compare the two images
-
-    return new NextResponse(
-      JSON.stringify({ okay: "okay", embedsQuery, embedsAns }),
-      {
-        status: 200,
-      }
+    const similarity = cosineSimilarity(
+      Object.values(embedsQuery.data),
+      Object.values(embedsAns.data)
     );
+
+    return new NextResponse(JSON.stringify({ okay: "okay", similarity }), {
+      status: 200,
+    });
   } catch (error) {
     console.error(error);
     return new NextResponse(JSON.stringify({ error }), {
