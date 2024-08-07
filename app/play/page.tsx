@@ -1,3 +1,4 @@
+"use client"
 import React from 'react';
 import GameScreen from '@/components/game/GameScreen'; // Adjust the path if necessary
 import MatchScreen from '@/components/game/MatchScreen';
@@ -8,7 +9,9 @@ import Leaderboard from '@/components/game/Leaderboard';
 const Play = () => {
   return (
     <div>
-      <Leaderboard />
+      <div><GameScreen /></div>
+    
+
     </div>
   );
 };
