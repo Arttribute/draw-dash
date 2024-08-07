@@ -9,7 +9,7 @@ import Leaderboard from '@/components/game/Leaderboard';
 const Play = () => {
   return (
     <div>
-      <div><GameScreen /></div>
+      <div><MatchScreen /></div>
     
 
     </div>
