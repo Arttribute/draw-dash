@@ -6,7 +6,7 @@ import {
 } from "@xenova/transformers";
 
 // Use the Singleton pattern to enable lazy construction of the pipeline.
-// NOTE: We wrap the class in a function to prevent code duplication (see below).
+// NOTE: We wrap the class in a function to prevent code duplication.
 const S = () =>
   class ApplicationSingleton {
     static model_id = "Xenova/clip-vit-base-patch16";

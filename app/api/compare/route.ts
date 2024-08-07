@@ -7,11 +7,6 @@ import {
 } from "@xenova/transformers";
 import { cosineSimilarity } from "./util";
 
-type Input = {
-  query_image: string;
-  ans_image: string;
-};
-
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
