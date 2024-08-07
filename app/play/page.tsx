@@ -4,11 +4,15 @@ import MatchScreen from '@/components/game/MatchScreen';
 import MintScreen from '@/components/game/MintScreen';
 import NFTScreen from '@/components/game/NFTScreen';
 import Leaderboard from '@/components/game/Leaderboard';
+import AppBar from '@/components/layout/AppBar';
 
 const Play = () => {
   return (
     <div>
       <Leaderboard />
+     
+      <AppBar />
+
     </div>
   );
 };
