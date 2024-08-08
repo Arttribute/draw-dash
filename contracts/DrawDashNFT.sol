@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract Tarot is ERC721URIStorage {
+contract DrawDash is ERC721URIStorage {
     uint256 private _tokenIdCounter = 0;
 
     constructor() ERC721("Draw Dash NFT", "DDASH") {}
