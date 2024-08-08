@@ -13,7 +13,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="flex flex-col items-center p-6 mt-10 min-h-screen">
+    <div className="flex flex-col items-center p-6 mt-14 min-h-screen">
       {/* Container for Diagonal Cards */}
       <div className="relative w-full max-w-lg p-6 bg-white border border-gray-200 rounded shadow-lg">
         <div className="absolute inset-0 opacity-30 rounded-lg bg-slate-200"></div>

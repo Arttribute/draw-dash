@@ -15,7 +15,7 @@ const MintScreen: React.FC<MintScreenProps> = ({ onComplete, onViewLeaderboard }
 
   return (
     <div className="flex flex-col items-center p-4">
-      <h1 className="text-2xl mb-4 mt-10"> Your Drawing</h1>
+      <h1 className="text-2xl mb-4 mt-14"> Your Drawing</h1>
       <MintForm imageUrl=''/>
       <Button onClick={handleMintComplete} className="mt-4 w-44">Mint Drawing</Button>
       {/* <Button onClick={onViewLeaderboard} className="mt-4">View Leaderboard</Button> */}
