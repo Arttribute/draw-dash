@@ -6,22 +6,59 @@ interface ToolBarProps {
   handleErase: () => void;
   handleUndo: () => void;
   handleRedo: () => void;
+  activeTool: 'draw' | 'erase';
 }
 
-const MyToolBar: React.FC<ToolBarProps> = ({ handleDraw, handleErase, handleUndo, handleRedo }) => {
+const MyToolBar: React.FC<ToolBarProps> = ({ handleDraw, handleErase, handleUndo, handleRedo, activeTool }) => {
   return (
-    <div className="flex gap-2 mt-4 justify-center">
-      <button onClick={handleDraw} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
-        <FaPen className="text-lg" />
+    <div  style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'center', marginBottom:'10px' }}>
+      <button
+        onClick={handleDraw}
+        style={{
+          padding: '8px',
+          backgroundColor: activeTool === 'draw' ? '#a0aec0' : '#e2e8f0', // Highlight if active
+          borderRadius: '8px',
+          transition: 'background-color 0.3s',
+          cursor: 'pointer',
+        }}
+      >
+        <FaPen style={{ fontSize: '20px', color: activeTool === 'draw' ? '#2d3748' : '#4a5568' }} />
       </button>
-      <button onClick={handleErase} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
-        <FaEraser className="text-lg" />
+      <button
+        onClick={handleErase}
+        style={{
+          padding: '8px',
+          backgroundColor: activeTool === 'erase' ? '#a0aec0' : '#e2e8f0', // Highlight if active
+          borderRadius: '8px',
+          transition: 'background-color 0.3s',
+          cursor: 'pointer',
+        }}
+      >
+        <FaEraser style={{ fontSize: '20px', color: activeTool === 'erase' ? '#2d3748' : '#4a5568' }} />
       </button>
-      <button onClick={handleUndo} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
-        <FaUndo className="text-lg" />
+      <button
+        onClick={handleUndo}
+        style={{
+          padding: '8px',
+          backgroundColor: '#e2e8f0',
+          borderRadius: '8px',
+          transition: 'background-color 0.3s',
+          cursor: 'pointer',
+        }}
+      >
+        <FaUndo style={{ fontSize: '20px', color: '#4a5568' }} />
       </button>
-      <button onClick={handleRedo} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
-        <FaRedo className="text-lg" />
+      <button
+        onClick={handleRedo}
+        style={{
+          padding: '8px',
+          backgroundColor: '#e2e8f0',
+          borderRadius: '8px',
+          transition: 'background-color 0.3s',
+          cursor: 'pointer',
+        }}
+      >
+        <FaRedo style={{ fontSize: '20px', color: '#4a5568' }} />
       </button>
     </div>
   );
