@@ -1,34 +1,30 @@
 import React from 'react';
+import { FaPen, FaEraser, FaUndo, FaRedo } from 'react-icons/fa';
 
 interface ToolBarProps {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  handleDraw: () => void;
+  handleErase: () => void;
+  handleUndo: () => void;
+  handleRedo: () => void;
 }
 
-const ToolBar: React.FC<ToolBarProps> = ({ canvasRef }) => {
-  const handleDraw = () => {
-    // Implement draw tool functionality
-  };
-
-  const handleErase = () => {
-    // Implement erase tool functionality
-  };
-
-  const handleUndo = () => {
-    // Implement undo functionality
-  };
-
-  const handleRedo = () => {
-    // Implement redo functionality
-  };
-
+const MyToolBar: React.FC<ToolBarProps> = ({ handleDraw, handleErase, handleUndo, handleRedo }) => {
   return (
-    <div className="flex gap-2 mt-4">
-      <button onClick={handleDraw} className="p-2 bg-gray-300 rounded hover:bg-gray-400">Draw</button>
-      <button onClick={handleErase} className="p-2 bg-gray-300 rounded hover:bg-gray-400">Erase</button>
-      <button onClick={handleUndo} className="p-2 bg-gray-300 rounded hover:bg-gray-400">Undo</button>
-      <button onClick={handleRedo} className="p-2 bg-gray-300 rounded hover:bg-gray-400">Redo</button>
+    <div className="flex gap-2 mt-4 justify-center">
+      <button onClick={handleDraw} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
+        <FaPen className="text-lg" />
+      </button>
+      <button onClick={handleErase} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
+        <FaEraser className="text-lg" />
+      </button>
+      <button onClick={handleUndo} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
+        <FaUndo className="text-lg" />
+      </button>
+      <button onClick={handleRedo} className="p-2 bg-gray-300 rounded hover:bg-gray-400">
+        <FaRedo className="text-lg" />
+      </button>
     </div>
   );
 };
 
-export default ToolBar;
+export default MyToolBar;
