@@ -1,8 +1,8 @@
 // pages/index.tsx
 import React from 'react';
 import AppBar from '../components/layout/AppBar';
-import CustomCard from '../components/game/CustomCard';
-import ImagePlaceholder from '../components/game/ImagePlaceholder';
+import CustomCard from '../components/ui/CustomCard';
+import ImagePlaceholder from '../components/ui/ImagePlaceholder';
 import  {Button }  from '../components/ui/button';
 import AccountMenu from '@/components/account/AccountMenu';
 import Link from "next/link";
@@ -40,9 +40,9 @@ const Home = () => {
         <section className="my-12 mx-6 "> 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <CustomCard
-              title="Compete and Earn"
+              title="Play and Earn"
               description="Show off your drawing skills by competing against others. Earn points and rewards based on how close your sketch is to the generated image."
-              buttonLabel="Join Now"
+              buttonLabel="Deposit"
             />
             <CustomCard
               title="NFT Marketplace"
@@ -53,7 +53,7 @@ const Home = () => {
         </section>
 
         <section className="my-12 mx-6 "> 
-          <h2 className="text-2xl font-bold mb-4">Community Creations</h2>
+          <h2 className="text-2xl font-bold mb-4">Games from the Community</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             {[1, 2, 3, 4].map((_, index) => (
               <ImagePlaceholder key={index} />
