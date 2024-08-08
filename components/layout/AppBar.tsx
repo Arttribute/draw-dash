@@ -1,5 +1,6 @@
 "use client";
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
+import AccountMenu from "@/components/account/AccountMenu";
 import { Logo } from "@/components/layout/logo";
 
 export default function AppBar() {
@@ -13,6 +14,9 @@ export default function AppBar() {
           </MenubarTrigger>
         </MenubarMenu>
         <div className="grow" />
+        <section className="my-12 mx-6 "> 
+          <AccountMenu />
+        </section>
       </Menubar>
     </div>
   );

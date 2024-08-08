@@ -17,13 +17,12 @@ const CustomCard: React.FC<CustomCardProps> = ({ title, description, buttonLabel
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <CardDescription>{description}</CardDescription>
+        <p className="hidden sm:block text-gray-600">{description}</p>
       </CardContent>
       <CardFooter>
-        <Button >{buttonLabel}</Button>
+        <Button>{buttonLabel}</Button>
       </CardFooter>
     </Card>
   );
 };
-
 export default CustomCard;
