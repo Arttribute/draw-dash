@@ -1,9 +1,8 @@
-// pages/index.tsx
 import React from 'react';
 import AppBar from '../components/layout/AppBar';
 import CustomCard from '../components/game/CustomCard';
 import ImagePlaceholder from '../components/game/ImagePlaceholder';
-import  {Button }  from '../components/ui/button';
+import { Button }  from '../components/ui/button';
 import AccountMenu from '@/components/account/AccountMenu';
 import Link from "next/link";
 import Image from 'next/image';
