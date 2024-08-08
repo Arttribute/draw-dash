@@ -62,21 +62,6 @@ const Play = () => {
       {currentScreen === "match" && (
         <MatchScreen onComplete={handleMatchScreenComplete} />
       )}
-      {currentScreen === "mint" && (
-        <MintScreen
-          onComplete={handleMintScreenComplete}
-          onViewLeaderboard={handleViewLeaderboard}
-        />
-      )}
-      {currentScreen === "nft" && (
-        <NFTScreen
-          onViewLeaderboard={handleViewLeaderboard}
-          onRestart={handleRestartGame}
-        />
-      )}
-      {currentScreen === "leaderboard" && (
-        <Leaderboard onGoBack={handleGoBack} onRestart={handleRestartGame} />
-      )}
     </div>
   );
 };
