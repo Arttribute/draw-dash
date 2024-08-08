@@ -1,4 +1,3 @@
-// pages/index.tsx
 import React from 'react';
 import AppBar from '../components/layout/AppBar';
 import CustomCard from '../components/ui/CustomCard';

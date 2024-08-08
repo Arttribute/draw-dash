@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, ForwardedRef } from 'react';
-import { FaPen, FaEraser } from 'react-icons/fa';
 import MyToolBar from './toolbar';
 
 interface DrawingCanvasProps {
@@ -14,8 +13,37 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     const [isErasing, setIsErasing] = useState(false);
     const [undoStack, setUndoStack] = useState<string[]>([]);
     const [redoStack, setRedoStack] = useState<string[]>([]);
+    const [activeTool, setActiveTool] = useState<'draw' | 'erase'>('draw'); 
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+    useEffect(() => {
+      const handleResize = () => {
+        if (canvasRef.current) {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            // Save current drawing
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            // Resize canvas
+            canvas.width = canvas.parentElement?.clientWidth || width;
+            canvas.height = canvas.parentElement?.clientHeight || height;
+
+            // Restore drawing
+            ctx.putImageData(imageData, 0, 0);
+          }
+        }
+      };
+
+      // Set initial size
+      handleResize();
+
+      // Add resize event listener
+      window.addEventListener('resize', handleResize);
+      
+      return () => window.removeEventListener('resize', handleResize);
+    }, [width, height]);
 
     useEffect(() => {
       if (canvasRef.current) {
@@ -23,7 +51,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         if (ctx) {
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
-          ctx.lineWidth = 5;
+          ctx.lineWidth = 3;
         }
       }
     }, []);
@@ -43,8 +71,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         if (ctx) {
           ctx.beginPath();
           ctx.moveTo(offsetX, offsetY);
-          setIsDrawing(true);
-          setIsErasing(false);
+          setIsDrawing(true); 
         }
       }
     };
@@ -60,28 +87,25 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     };
 
     const stopDrawing = () => {
-      if (canvasRef.current) {
-        if (isDrawing || isErasing) {
-          setIsDrawing(false);
-          setIsErasing(false);
-          setUndoStack([...undoStack, canvasRef.current.toDataURL()]);
-          setRedoStack([]);
-        }
+      if (canvasRef.current && isDrawing) {
+        setIsDrawing(false); 
+        setUndoStack([...undoStack, canvasRef.current.toDataURL()]);
+        setRedoStack([]);
       }
     };
 
     const handleUndo = () => {
       if (canvasRef.current && undoStack.length > 0) {
-        const ctx = canvasRef.current.getContext('2d');
+        const ctx = canvasRef.current!.getContext('2d');
         const lastState = undoStack.pop()!;
-        setRedoStack([...redoStack, canvasRef.current.toDataURL()]);
+        setRedoStack([...redoStack, canvasRef.current!.toDataURL()]);
         setUndoStack([...undoStack]);
-
+    
         const img = new Image();
         img.src = lastState;
         img.onload = () => {
           if (ctx) {
-            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
             ctx.drawImage(img, 0, 0);
           }
         };
@@ -99,7 +123,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         img.src = nextState;
         img.onload = () => {
           if (ctx) {
-            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
             ctx.drawImage(img, 0, 0);
           }
         };
@@ -110,10 +134,10 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
       if (canvasRef.current) {
         const ctx = canvasRef.current.getContext('2d');
         if (ctx) {
-          ctx.globalCompositeOperation = 'source-over'; // Draw mode
+          ctx.globalCompositeOperation = 'source-over'; 
         }
-        setIsDrawing(true);
-        setIsErasing(false);
+        setActiveTool('draw'); 
+        setIsErasing(false); 
       }
     };
 
@@ -121,16 +145,17 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
       if (canvasRef.current) {
         const ctx = canvasRef.current.getContext('2d');
         if (ctx) {
-          ctx.globalCompositeOperation = 'destination-out'; // Erase mode
-          ctx.lineWidth = eraserSize; // Set eraser size
+          ctx.globalCompositeOperation = 'destination-out'; 
+          ctx.lineWidth = eraserSize; 
         }
+        setActiveTool('erase'); 
+        setIsErasing(true); 
         setIsDrawing(false);
-        setIsErasing(true);
       }
     };
 
     return (
-      <div className="relative">
+      <div className="relative w-full h-full">
         <canvas
           ref={(node) => {
             canvasRef.current = node;
@@ -140,19 +165,19 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
               ref.current = node;
             }
           }}
-          width={width}
-          height={height}
-          className="border border-gray-300"
+          className={`border border-gray-300 ${isErasing ? 'cursor-cell' : 'cursor-crosshair'} 
+            w-full h-full`}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
+          onMouseLeave={stopDrawing} 
         />
         <MyToolBar
           handleDraw={handleDraw}
           handleErase={handleErase}
           handleUndo={handleUndo}
           handleRedo={handleRedo}
+          activeTool={activeTool} 
         />
       </div>
     );
