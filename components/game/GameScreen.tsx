@@ -32,7 +32,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onComplete }) => {
   const timerProgress = (timeLeft / 60) * 100;
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 md:p-8 lg:p-12 h-screen mt-14 ">
+    <div className="flex flex-col items-center justify-center p-4 md:p-8 lg:p-12 h-screen mt-16 ">
       <div className="flex flex-col md:flex-row items-center justify-between w-full mb-4 mt-10 p-4 rounded-lg">
         <ScoreDisplay score={score} />
         <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28">
