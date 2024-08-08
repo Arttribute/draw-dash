@@ -1,18 +1,49 @@
 "use client";
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import ImageComparison from "../ui/imagecomparison";
 import { MintDialog } from "./MintDialog";
 import { Copy } from "lucide-react";
 
+import axios from "axios";
+
 interface MatchScreenProps {
   onComplete: () => void;
+  promptId: string;
+  modelId: string;
 }
 
-const MatchScreen: React.FC<MatchScreenProps> = ({ onComplete }) => {
+const MatchScreen: React.FC<MatchScreenProps> = ({
+  onComplete,
+  promptId,
+  modelId,
+}) => {
+  const [generatedImage, setGeneratedimage] = useState("");
   const handleMintButtonClick = () => {
     onComplete(); // Trigger the transition to the MintScreen
   };
+
+  useEffect(() => {
+    getAIImage(promptId, modelId);
+  }, []);
+
+  async function getAIImage(promptId: string, modelId: string) {
+    try {
+      const result = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/generate/image/${promptId}`,
+        {
+          params: { model_id: modelId, prompt_id: promptId },
+        }
+      );
+      console.log("result", result);
+      const promptleImages = result.data.data.images;
+
+      console.log("promptleImages", promptleImages);
+      setGeneratedimage(result.data.data.images[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div className="flex flex-col items-center p-6 mt-10 min-h-screen">
@@ -30,12 +61,12 @@ const MatchScreen: React.FC<MatchScreenProps> = ({ onComplete }) => {
               <p className="text-xs font-semibold text-gray-800">similarity</p>
             </div>
             <div className="text-center mb-4 ">
-              <span className="text-sm text-green-600">85%</span>
+              <span className="text-sm text-green-600">60 sec</span>
               <p className="text-xs font-semibold text-gray-800">time taken</p>
             </div>
           </div>
           {/* Diagonal Image Cards */}
-          <ImageComparison />
+          <ImageComparison generatedImage={generatedImage} />
           {/* Mint Button */}
           <div className="flex justify-center w-full mt-6">
             <MintDialog />

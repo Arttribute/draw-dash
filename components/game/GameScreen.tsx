@@ -5,28 +5,25 @@ import ScoreDisplay from "./ScoreDisplay";
 import DrawingCanvas from "../ui/drawingcanvas";
 import GameTimer from "./GameTimer";
 import "react-circular-progressbar/dist/styles.css";
+import axios from "axios";
 
 interface GameScreenProps {
   onComplete: () => void;
+  setPromptId: any;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ onComplete }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ onComplete, setPromptId }) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
-  const [generatedText, setGeneratedText] = useState(
-    "Create a surreal landscape painting. Imagine a dreamlike scene where a giant, ancient tree with glowing leaves stands in the middle of a vast, reflective lake."
-  );
+  const [generatedText, setGeneratedText] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(60);
-  const [isTimerActive, setIsTimerActive] = useState(true);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [loadingPrompt, setLoadingPrompt] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timer);
+    generatePrompt();
   }, []);
 
   const handleSubmit = () => {
@@ -34,10 +31,61 @@ const GameScreen: React.FC<GameScreenProps> = ({ onComplete }) => {
     onComplete(); // Trigger the transition to the next screen
   };
 
-  const timerProgress = (timeLeft / 60) * 100;
+  async function generatePrompt() {
+    setLoadingPrompt(true);
+    try {
+      const response = await fetch("/api/generate/prompt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          input: "create",
+        }),
+      });
+      console.log("response", response);
+      const res = await response.json();
+      console.log("res", res);
+      setGeneratedText(res.image_prompt);
+      generateArt(res.image_prompt);
+      setIsTimerActive(true);
+    } catch (error) {
+      console.error("Error in generating prompts", error);
+    }
+    setLoadingPrompt(false);
+  }
+
+  async function generateArt(image_prompt: string) {
+    try {
+      console.log("prompt :", image_prompt);
+      let promptToken = "sks style"; //TODO: replace with this `${tunedModel.modeldata.token} style` || "sks style";
+      const textToImageObject = {
+        text: image_prompt,
+        negative_prompt: "ugly ",
+        super_resolution: true,
+        face_correct: true,
+        num_images: 1,
+        callback: 0,
+      };
+
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/generate/image`,
+        {
+          textToImageObject,
+          modelId: "690204",
+        }
+      );
+      const PromptResponse = res.data;
+      console.log("Prompt Response", PromptResponse);
+      setPromptId(PromptResponse.id);
+    } catch (error) {
+      console.error("Error in API call:", error);
+    }
+  }
 
   return (
     <div className="grid grid-cols-12 gap-2 flex flex-col  justify-center p-4 md:p-8 lg:p-12 lg:w-[600px]">
+      {loadingPrompt && <p>Loading...</p>}
       <div className="lg:hidden flex col-span-12 ">
         <div className="w-16 ">
           <ScoreDisplay score={score} />

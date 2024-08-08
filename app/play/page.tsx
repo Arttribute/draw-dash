@@ -9,6 +9,8 @@ import AppBar from "@/components/layout/AppBar";
 
 const Play = () => {
   const [currentScreen, setCurrentScreen] = useState("game"); // Default to 'game'
+  const [promptId, setPromptId] = useState("");
+  const [modelId, setModelId] = useState("690204");
 
   const handleGameScreenComplete = () => {
     setCurrentScreen("match");
@@ -57,10 +59,17 @@ const Play = () => {
   return (
     <div className="flex flex-col items-center justify-center lg:h-screen">
       {currentScreen === "game" && (
-        <GameScreen onComplete={handleGameScreenComplete} />
+        <GameScreen
+          onComplete={handleGameScreenComplete}
+          setPromptId={setPromptId}
+        />
       )}
       {currentScreen === "match" && (
-        <MatchScreen onComplete={handleMatchScreenComplete} />
+        <MatchScreen
+          onComplete={handleMatchScreenComplete}
+          promptId={promptId}
+          modelId={modelId}
+        />
       )}
     </div>
   );
