@@ -44,7 +44,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     };
 
     const resizeCanvas = (canvas: HTMLCanvasElement) => {
-      const parent = canvas.parentElement;
+      const parent = canvas?.parentElement;
       if (parent) {
         const { clientWidth, clientHeight } = parent;
         setCanvasSize({ width: clientWidth, height: clientHeight });

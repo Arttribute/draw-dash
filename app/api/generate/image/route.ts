@@ -7,15 +7,20 @@ export async function POST(request: Request) {
   const { textToImageObject, modelId } = await request.json();
 
   try {
+    const formData = new FormData();
+    Object.keys(textToImageObject).forEach((key) => {
+      if (textToImageObject[key] !== undefined) {
+        formData.append(`prompt[${key}]`, textToImageObject[key]);
+      }
+    });
     const promptRes = await fetch(
       `https://api.astria.ai/tunes/${modelId}/prompts`,
       {
         method: "POST",
         headers: {
           Authorization: "Bearer " + API_KEY,
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify(textToImageObject),
+        body: formData,
       }
     );
     const text2ImageResponse = await promptRes.json();

@@ -10,12 +10,14 @@ import axios from "axios";
 interface GameScreenProps {
   onComplete: () => void;
   setPromptId: any;
+  setImagePrompt: any;
   setDrawingUrl: any;
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({
   onComplete,
   setPromptId,
+  setImagePrompt,
   setDrawingUrl,
 }) => {
   const [score, setScore] = useState(0);
@@ -34,26 +36,48 @@ const GameScreen: React.FC<GameScreenProps> = ({
   const handleSubmit = () => {
     setScore(Math.floor(Math.random() * 100));
     if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      canvas.toBlob(async (blob) => {
-        if (blob) {
-          const data = new FormData();
-          data.append("file", blob, "drawing.png");
-          data.append("upload_preset", "studio-upload");
-          const res = await axios.post(
-            "https://api.cloudinary.com/v1_1/arttribute/upload",
-            data
-          );
-          const uploadedFile = res.data;
-          setDrawingUrl(uploadedFile.secure_url);
+      const originalCanvas = canvasRef.current;
+      const originalContext = originalCanvas.getContext("2d");
+
+      if (originalContext) {
+        // Create a new canvas with the same dimensions
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = originalCanvas.width;
+        tempCanvas.height = originalCanvas.height;
+        const tempContext = tempCanvas.getContext("2d");
+
+        if (tempContext) {
+          // Fill the new canvas with a white background
+          tempContext.fillStyle = "#ffffff"; // White color
+          tempContext.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+          // Draw the original canvas content on top of the white background
+          tempContext.drawImage(originalCanvas, 0, 0);
+
+          // Convert the new canvas to a blob and upload it
+          tempCanvas.toBlob(async (blob) => {
+            if (blob) {
+              const data = new FormData();
+              data.append("file", blob, "drawing.png");
+              data.append("upload_preset", "studio-upload");
+              const res = await axios.post(
+                "https://api.cloudinary.com/v1_1/arttribute/upload",
+                data
+              );
+              const uploadedFile = res.data;
+              setDrawingUrl(uploadedFile.secure_url);
+            }
+          }, "image/png");
         }
-      }, "image/png");
+      }
     }
     onComplete(); // Trigger the transition to the next screen
   };
 
   async function generatePrompt() {
     setLoadingPrompt(true);
+    setGeneratedText("");
+    setImagePrompt("");
     try {
       const response = await fetch("/api/generate/prompt", {
         method: "POST",
@@ -68,6 +92,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       const res = await response.json();
       console.log("res", res);
       setGeneratedText(res.image_prompt);
+      setImagePrompt(res.image_prompt);
       generateArt(res.image_prompt);
       setIsTimerActive(true);
     } catch (error) {

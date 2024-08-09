@@ -11,6 +11,7 @@ interface MatchScreenProps {
   onComplete: () => void;
   promptId: string;
   modelId: string;
+  imagePrompt: string;
   drawingUrl: string;
   similarity: number;
   setSimilarity: any;
@@ -20,6 +21,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   onComplete,
   promptId,
   modelId,
+  imagePrompt,
   drawingUrl,
   similarity,
   setSimilarity,
@@ -36,12 +38,12 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   }, []);
 
   useEffect(() => {
-    if (generatedImage) {
+    if (generatedImage !== "" && drawingUrl !== "") {
       compareImages(drawingUrl, generatedImage);
     } else {
       getAIImage(promptId, modelId);
     }
-  }, [generatedImage]);
+  }, [generatedImage, drawingUrl]);
 
   async function getAIImage(promptId: string, modelId: string) {
     try {
@@ -65,7 +67,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   // query image is the drawing, ans image is the AI generated image
   async function compareImages(queryImageURL: string, ansImageURL: string) {
     setLoadingComparison(true);
-
+    setSimilarity(0);
     // Create form data
     const formData = new FormData();
     formData.append("query_image", queryImageURL);
@@ -94,7 +96,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
           <div className="flex items-center justify-center">
             <div className="text-center mb-4 mr-4">
               <span className="text-sm text-green-600">
-                {similarity.toFixed(2)}
+                {similarity?.toFixed(2)}
               </span>
               <p className="text-xs font-semibold text-gray-800">similarity</p>
             </div>
@@ -110,7 +112,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
           />
           {/* Mint Button */}
           <div className="flex justify-center w-full mt-6">
-            <MintDialog drawingUrl={drawingUrl} />
+            <MintDialog drawingUrl={drawingUrl} prompt={imagePrompt} />
           </div>
           <div className="flex justify-center w-full">
             <Button

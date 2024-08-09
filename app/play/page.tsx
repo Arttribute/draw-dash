@@ -13,6 +13,7 @@ const Play = () => {
   const [modelId, setModelId] = useState("690204");
   const [drawingUrl, setDrawingUrl] = useState("");
   const [similarity, setSimilarity] = useState(0);
+  const [imagePrompt, setImagePrompt] = useState("");
 
   const handleGameScreenComplete = () => {
     setCurrentScreen("match");
@@ -65,12 +66,14 @@ const Play = () => {
           onComplete={handleGameScreenComplete}
           setPromptId={setPromptId}
           setDrawingUrl={setDrawingUrl}
+          setImagePrompt={setImagePrompt}
         />
       )}
       {currentScreen === "match" && (
         <MatchScreen
           onComplete={handleMatchScreenComplete}
           promptId={promptId}
+          imagePrompt={imagePrompt}
           modelId={modelId}
           drawingUrl={drawingUrl}
           similarity={similarity}
