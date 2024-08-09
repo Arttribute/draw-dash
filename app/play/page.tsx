@@ -12,6 +12,7 @@ const Play = () => {
   const [promptId, setPromptId] = useState("");
   const [modelId, setModelId] = useState("690204");
   const [drawingUrl, setDrawingUrl] = useState("");
+  const [similarity, setSimilarity] = useState(0);
 
   const handleGameScreenComplete = () => {
     setCurrentScreen("match");
@@ -72,6 +73,8 @@ const Play = () => {
           promptId={promptId}
           modelId={modelId}
           drawingUrl={drawingUrl}
+          similarity={similarity}
+          setSimilarity={setSimilarity}
         />
       )}
     </div>

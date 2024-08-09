@@ -77,6 +77,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   async function generateArt(image_prompt: string) {
+    setPromptId("");
     try {
       console.log("prompt :", image_prompt);
       let promptToken = "sks style"; //TODO: replace with this `${tunedModel.modeldata.token} style` || "sks style";

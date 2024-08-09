@@ -12,6 +12,8 @@ interface MatchScreenProps {
   promptId: string;
   modelId: string;
   drawingUrl: string;
+  similarity: number;
+  setSimilarity: any;
 }
 
 const MatchScreen: React.FC<MatchScreenProps> = ({
@@ -19,8 +21,12 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   promptId,
   modelId,
   drawingUrl,
+  similarity,
+  setSimilarity,
 }) => {
-  const [generatedImage, setGeneratedimage] = useState("");
+  const [generatedImage, setGeneratedImage] = useState("");
+  const [loadingComaprison, setLoadingComparison] = useState(false);
+
   const handleMintButtonClick = () => {
     onComplete(); // Trigger the transition to the MintScreen
   };
@@ -29,8 +35,17 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
     getAIImage(promptId, modelId);
   }, []);
 
+  useEffect(() => {
+    if (generatedImage) {
+      compareImages(generatedImage, drawingUrl);
+    } else {
+      getAIImage(promptId, modelId);
+    }
+  }, [generatedImage]);
+
   async function getAIImage(promptId: string, modelId: string) {
     try {
+      setGeneratedImage("");
       const result = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/generate/image/${promptId}`,
         {
@@ -41,10 +56,42 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
       const promptleImages = result.data.data.images;
 
       console.log("promptleImages", promptleImages);
-      setGeneratedimage(result.data.data.images[0]);
+      setGeneratedImage(result.data.data.images[0]);
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async function compareImages(queryImageURL: string, ansImageURL: string) {
+    setLoadingComparison(true);
+    //upload image to cloudinary to avoid cors error
+    const queryImagedata = new FormData();
+    queryImagedata.append("file", queryImageURL);
+    queryImagedata.append("upload_preset", "studio-upload");
+    const resImage = await axios.post(
+      "https://api.cloudinary.com/v1_1/arttribute/upload",
+      queryImagedata
+    );
+    console.log("AI image uploaded to cloudinary");
+    const queryImageResponse = await fetch(resImage.data.secure_url);
+    const ansImageResponse = await fetch(ansImageURL);
+
+    const queryImageBlob = await queryImageResponse.blob();
+    const ansImageBlob = await ansImageResponse.blob();
+
+    // Create form data
+    const formData = new FormData();
+    formData.append("query_image", queryImageBlob, "query_image.jpg"); // Change the name if necessary
+    formData.append("ans_image", ansImageBlob, "ans_image.jpg"); // Change the name if necessary
+
+    const res = await fetch("/api/compare", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    console.log("Comparison Data", data);
+    setSimilarity(data.similarity);
+    setLoadingComparison(false);
   }
 
   return (
@@ -59,7 +106,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
           </div>
           <div className="flex items-center justify-center">
             <div className="text-center mb-4 mr-4">
-              <span className="text-sm text-green-600">85%</span>
+              <span className="text-sm text-green-600">{similarity}</span>
               <p className="text-xs font-semibold text-gray-800">similarity</p>
             </div>
             <div className="text-center mb-4 ">
