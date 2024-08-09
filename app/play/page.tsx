@@ -27,7 +27,7 @@ const Play = () => {
   };
 
   const handleViewLeaderboard = () => {
-    setCurrentScreen('leaderboard');
+    setCurrentScreen('dashboard');
   };
 
   const handleGoBack = () => {
