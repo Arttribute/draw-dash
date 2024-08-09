@@ -2,10 +2,10 @@ import React from 'react';
 
 const ImageComparison: React.FC = () => {
     return (
-        <div className="flex items-center justify-center flex-col">
+        <div className="flex flex-col md:flex-row items-center justify-center space-y-6 md:space-y-0 md:space-x-6">
 
             {/* User's Drawing */}
-            <div className="relative w-1/2 ml-44">
+            <div className="relative w-full md:w-1/2">
                 <div className="relative bg-gray-200 border border-gray-300 rounded overflow-hidden">
                     <img
                         src="path_to_user_image"
@@ -17,8 +17,9 @@ const ImageComparison: React.FC = () => {
                     </div>
                 </div>
             </div>
+
             {/* AI Generated Image */}
-            <div className="relative w-1/2 mr-44 mt-[-30px]">
+            <div className="relative w-full md:w-1/2">
                 <div className="relative bg-gray-200 border border-gray-300 rounded overflow-hidden">
                     <img
                         src="path_to_ai_image"

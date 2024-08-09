@@ -57,6 +57,7 @@ const Play = () => {
 
   return (
     <div>
+      <AppBar/>
       {currentScreen === 'game' && <GameScreen onComplete={handleGameScreenComplete} />}
       {currentScreen === 'match' && <MatchScreen onComplete={handleMatchScreenComplete} />}
       {currentScreen === 'mint' && 

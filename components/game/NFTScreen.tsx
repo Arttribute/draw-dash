@@ -13,7 +13,7 @@ const NFTScreen: React.FC<NFTScreenProps> = ({ onViewLeaderboard, onRestart }) =
 
   return (
     <div className="flex flex-col items-center p-4">
-      <div className="w-full max-w-4xl mt-10">
+      <div className="w-full max-w-4xl mt-14">
         <div className="flex border-b border-gray-300 mb-4">
           <button
             className={`py-2 px-4 text-lg font-medium ${activeTab === 'all' ? 'border-b-2 border-blue-500' : 'text-gray-500'}`}
