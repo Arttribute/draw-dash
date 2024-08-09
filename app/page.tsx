@@ -31,6 +31,11 @@ const Home = () => {
       author: "by Author4",
       imageUrl: "/assets/cat4.jpeg"
     },
+    {
+      title: "Test Game 5",
+      author: "by Author5",
+      imageUrl: "/assets/test.jpeg"
+    },
   ];
   
   return (
