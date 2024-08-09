@@ -60,26 +60,30 @@ const Play = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center lg:h-screen">
-      {currentScreen === "game" && (
-        <GameScreen
-          onComplete={handleGameScreenComplete}
-          setPromptId={setPromptId}
-          setDrawingUrl={setDrawingUrl}
-          setImagePrompt={setImagePrompt}
-        />
-      )}
-      {currentScreen === "match" && (
-        <MatchScreen
-          onComplete={handleMatchScreenComplete}
-          promptId={promptId}
-          imagePrompt={imagePrompt}
-          modelId={modelId}
-          drawingUrl={drawingUrl}
-          similarity={similarity}
-          setSimilarity={setSimilarity}
-        />
-      )}
+    <div>
+      <AppBar />
+      1234567
+      <div className="flex flex-col items-center justify-center mt-8 ">
+        {currentScreen === "game" && (
+          <GameScreen
+            onComplete={handleGameScreenComplete}
+            setPromptId={setPromptId}
+            setDrawingUrl={setDrawingUrl}
+            setImagePrompt={setImagePrompt}
+          />
+        )}
+        {currentScreen === "match" && (
+          <MatchScreen
+            onComplete={handleMatchScreenComplete}
+            promptId={promptId}
+            imagePrompt={imagePrompt}
+            modelId={modelId}
+            drawingUrl={drawingUrl}
+            similarity={similarity}
+            setSimilarity={setSimilarity}
+          />
+        )}
+      </div>
     </div>
   );
 };
