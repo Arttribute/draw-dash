@@ -234,4 +234,6 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
   }
 );
 
+DrawingCanvas.displayName = "DrawingCanvas";
+
 export default DrawingCanvas;

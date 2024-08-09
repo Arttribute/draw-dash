@@ -37,7 +37,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
 
   useEffect(() => {
     if (generatedImage) {
-      compareImages(generatedImage, drawingUrl);
+      compareImages(drawingUrl, generatedImage);
     } else {
       getAIImage(promptId, modelId);
     }
@@ -62,27 +62,14 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
     }
   }
 
+  // query image is the drawing, ans image is the AI generated image
   async function compareImages(queryImageURL: string, ansImageURL: string) {
     setLoadingComparison(true);
-    //upload image to cloudinary to avoid cors error
-    const queryImagedata = new FormData();
-    queryImagedata.append("file", queryImageURL);
-    queryImagedata.append("upload_preset", "studio-upload");
-    const resImage = await axios.post(
-      "https://api.cloudinary.com/v1_1/arttribute/upload",
-      queryImagedata
-    );
-    console.log("AI image uploaded to cloudinary");
-    const queryImageResponse = await fetch(resImage.data.secure_url);
-    const ansImageResponse = await fetch(ansImageURL);
-
-    const queryImageBlob = await queryImageResponse.blob();
-    const ansImageBlob = await ansImageResponse.blob();
 
     // Create form data
     const formData = new FormData();
-    formData.append("query_image", queryImageBlob, "query_image.jpg"); // Change the name if necessary
-    formData.append("ans_image", ansImageBlob, "ans_image.jpg"); // Change the name if necessary
+    formData.append("query_image", queryImageURL);
+    formData.append("ans_image", ansImageURL);
 
     const res = await fetch("/api/compare", {
       method: "POST",
@@ -106,7 +93,9 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
           </div>
           <div className="flex items-center justify-center">
             <div className="text-center mb-4 mr-4">
-              <span className="text-sm text-green-600">{similarity}</span>
+              <span className="text-sm text-green-600">
+                {similarity.toFixed(2)}
+              </span>
               <p className="text-xs font-semibold text-gray-800">similarity</p>
             </div>
             <div className="text-center mb-4 ">
