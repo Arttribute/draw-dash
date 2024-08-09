@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 
-export function MintDialog() {
+export function MintDialog({ drawingUrl }: { drawingUrl: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -27,14 +27,15 @@ export function MintDialog() {
             Enhance your creation with AI and mint your sketch
           </DialogDescription>
         </DialogHeader>
-
-        <Image
-          src="/path_to_user_image"
-          width={600}
-          height={600}
-          alt="User's Drawing"
-          className=" rounded-xl object-cover w-full aspect-[1]"
-        />
+        <div className="border p-1 rounded-xl">
+          <Image
+            src={drawingUrl}
+            width={600}
+            height={600}
+            alt="User's Drawing"
+            className=" rounded-xl object-cover w-full aspect-[1]"
+          />
+        </div>
         <Input id="name" placeholder="Name your creation" />
 
         <DialogFooter>

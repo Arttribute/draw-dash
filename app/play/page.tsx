@@ -11,6 +11,7 @@ const Play = () => {
   const [currentScreen, setCurrentScreen] = useState("game"); // Default to 'game'
   const [promptId, setPromptId] = useState("");
   const [modelId, setModelId] = useState("690204");
+  const [drawingUrl, setDrawingUrl] = useState("");
 
   const handleGameScreenComplete = () => {
     setCurrentScreen("match");
@@ -62,6 +63,7 @@ const Play = () => {
         <GameScreen
           onComplete={handleGameScreenComplete}
           setPromptId={setPromptId}
+          setDrawingUrl={setDrawingUrl}
         />
       )}
       {currentScreen === "match" && (
@@ -69,6 +71,7 @@ const Play = () => {
           onComplete={handleMatchScreenComplete}
           promptId={promptId}
           modelId={modelId}
+          drawingUrl={drawingUrl}
         />
       )}
     </div>

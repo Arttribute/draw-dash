@@ -11,12 +11,14 @@ interface MatchScreenProps {
   onComplete: () => void;
   promptId: string;
   modelId: string;
+  drawingUrl: string;
 }
 
 const MatchScreen: React.FC<MatchScreenProps> = ({
   onComplete,
   promptId,
   modelId,
+  drawingUrl,
 }) => {
   const [generatedImage, setGeneratedimage] = useState("");
   const handleMintButtonClick = () => {
@@ -66,10 +68,13 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
             </div>
           </div>
           {/* Diagonal Image Cards */}
-          <ImageComparison generatedImage={generatedImage} />
+          <ImageComparison
+            generatedImage={generatedImage}
+            drawingUrl={drawingUrl}
+          />
           {/* Mint Button */}
           <div className="flex justify-center w-full mt-6">
-            <MintDialog />
+            <MintDialog drawingUrl={drawingUrl} />
           </div>
           <div className="flex justify-center w-full">
             <Button

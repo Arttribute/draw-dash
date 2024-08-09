@@ -17,41 +17,60 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     const [undoStack, setUndoStack] = useState<string[]>([]);
     const [redoStack, setRedoStack] = useState<string[]>([]);
     const [activeTool, setActiveTool] = useState<"draw" | "erase">("draw");
+    const [canvasSize, setCanvasSize] = useState({ width, height });
+    const [lineWidth, setLineWidth] = useState(3);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    useEffect(() => {
-      const handleResize = () => {
-        if (canvasRef.current) {
-          const canvas = canvasRef.current;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            // Save current drawing
-            const imageData = ctx.getImageData(
-              0,
-              0,
-              canvas.width,
-              canvas.height
-            );
+    // Utility function to get the correct coordinates for mouse and touch events
+    const getEventCoords = (
+      event: React.MouseEvent | React.TouchEvent,
+      canvas: HTMLCanvasElement
+    ) => {
+      let offsetX: number;
+      let offsetY: number;
 
-            // Resize canvas
-            canvas.width = canvas.parentElement?.clientWidth || width;
-            canvas.height = canvas.parentElement?.clientHeight || height;
+      if ("touches" in event) {
+        const touch = event.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+      } else {
+        offsetX = event.nativeEvent.offsetX;
+        offsetY = event.nativeEvent.offsetY;
+      }
 
-            // Restore drawing
-            ctx.putImageData(imageData, 0, 0);
-          }
+      return { offsetX, offsetY };
+    };
+
+    const resizeCanvas = (canvas: HTMLCanvasElement) => {
+      const parent = canvas.parentElement;
+      if (parent) {
+        const { clientWidth, clientHeight } = parent;
+        setCanvasSize({ width: clientWidth, height: clientHeight });
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          canvas.width = clientWidth;
+          canvas.height = clientHeight;
+          ctx.putImageData(imageData, 0, 0);
         }
+      }
+    };
+
+    useEffect(() => {
+      if (canvasRef.current) {
+        resizeCanvas(canvasRef.current);
+        window.addEventListener("resize", () =>
+          resizeCanvas(canvasRef.current!)
+        );
+      }
+      return () => {
+        window.removeEventListener("resize", () =>
+          resizeCanvas(canvasRef.current!)
+        );
       };
-
-      // Set initial size
-      handleResize();
-
-      // Add resize event listener
-      window.addEventListener("resize", handleResize);
-
-      return () => window.removeEventListener("resize", handleResize);
-    }, [width, height]);
+    }, []);
 
     useEffect(() => {
       if (canvasRef.current) {
@@ -59,10 +78,10 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         if (ctx) {
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
-          ctx.lineWidth = 3;
+          ctx.lineWidth = lineWidth; // Use initial line width
         }
       }
-    }, []);
+    }, [lineWidth]);
 
     useEffect(() => {
       if (typeof ref === "function") {
@@ -72,9 +91,10 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
       }
     }, [ref]);
 
-    const startDrawing = ({ nativeEvent }: React.MouseEvent) => {
+    const startDrawing = (event: React.MouseEvent | React.TouchEvent) => {
+      event.preventDefault(); // Prevent scrolling
       if (canvasRef.current) {
-        const { offsetX, offsetY } = nativeEvent;
+        const { offsetX, offsetY } = getEventCoords(event, canvasRef.current);
         const ctx = canvasRef.current.getContext("2d");
         if (ctx) {
           ctx.beginPath();
@@ -84,13 +104,15 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
       }
     };
 
-    const draw = ({ nativeEvent }: React.MouseEvent) => {
+    const draw = (event: React.MouseEvent | React.TouchEvent) => {
+      event.preventDefault(); // Prevent scrolling
       if (!isDrawing || !canvasRef.current) return;
-      const { offsetX, offsetY } = nativeEvent;
+      const { offsetX, offsetY } = getEventCoords(event, canvasRef.current);
       const ctx = canvasRef.current.getContext("2d");
       if (ctx) {
         ctx.lineTo(offsetX, offsetY);
         ctx.stroke();
+        ctx.lineWidth = lineWidth;
       }
     };
 
@@ -153,6 +175,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         const ctx = canvasRef.current.getContext("2d");
         if (ctx) {
           ctx.globalCompositeOperation = "source-over";
+          ctx.lineWidth = lineWidth;
         }
         setActiveTool("draw");
         setIsErasing(false);
@@ -164,7 +187,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         const ctx = canvasRef.current.getContext("2d");
         if (ctx) {
           ctx.globalCompositeOperation = "destination-out";
-          ctx.lineWidth = eraserSize;
+          ctx.lineWidth = eraserSize; // Use eraser size when erasing
         }
         setActiveTool("erase");
         setIsErasing(true);
@@ -173,7 +196,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     };
 
     return (
-      <div className="relative w-full h-full ">
+      <div className="relative w-full h-full">
         <div className="-mb-10">
           <MyToolBar
             handleDraw={handleDraw}
@@ -195,11 +218,16 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
           className={`border border-gray-300 rounded-xl ${
             isErasing ? "cursor-cell" : "cursor-crosshair"
           } 
-            w-full h-full`}
+            w-full h-full touch-none select-none`}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+          width={canvasSize.width}
+          height={canvasSize.height}
         />
       </div>
     );

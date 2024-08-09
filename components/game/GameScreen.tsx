@@ -10,9 +10,14 @@ import axios from "axios";
 interface GameScreenProps {
   onComplete: () => void;
   setPromptId: any;
+  setDrawingUrl: any;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ onComplete, setPromptId }) => {
+const GameScreen: React.FC<GameScreenProps> = ({
+  onComplete,
+  setPromptId,
+  setDrawingUrl,
+}) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [generatedText, setGeneratedText] = useState("");
@@ -28,6 +33,22 @@ const GameScreen: React.FC<GameScreenProps> = ({ onComplete, setPromptId }) => {
 
   const handleSubmit = () => {
     setScore(Math.floor(Math.random() * 100));
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          const data = new FormData();
+          data.append("file", blob, "drawing.png");
+          data.append("upload_preset", "studio-upload");
+          const res = await axios.post(
+            "https://api.cloudinary.com/v1_1/arttribute/upload",
+            data
+          );
+          const uploadedFile = res.data;
+          setDrawingUrl(uploadedFile.secure_url);
+        }
+      }, "image/png");
+    }
     onComplete(); // Trigger the transition to the next screen
   };
 
@@ -85,7 +106,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ onComplete, setPromptId }) => {
 
   return (
     <div className="grid grid-cols-12 gap-2 flex flex-col  justify-center p-4 md:p-8 lg:p-12 lg:w-[600px]">
-      {loadingPrompt && <p>Loading...</p>}
       <div className="lg:hidden flex col-span-12 ">
         <div className="w-16 ">
           <ScoreDisplay score={score} />
@@ -105,6 +125,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onComplete, setPromptId }) => {
       <div className=" col-span-12 lg:col-span-10  w-full ">
         <div className="text-sm text-center text-white bg-indigo-500 rounded-xl p-4">
           {generatedText}
+          {loadingPrompt && <p>Loading...</p>}
         </div>
         <div className="w-full h-96 sm:h-[40vh] md:h-[50vh] lg:h-[50vh] mb-16">
           <DrawingCanvas ref={canvasRef} />

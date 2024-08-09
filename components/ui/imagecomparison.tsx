@@ -3,9 +3,13 @@ import Image from "next/image";
 
 interface ImageComparison {
   generatedImage: string;
+  drawingUrl: string;
 }
 
-const ImageComparison: React.FC<ImageComparison> = ({ generatedImage }) => {
+const ImageComparison: React.FC<ImageComparison> = ({
+  generatedImage,
+  drawingUrl,
+}) => {
   return (
     <div className="flex items-center justify-center flex-col">
       {/* AI Generated Image */}
@@ -24,7 +28,7 @@ const ImageComparison: React.FC<ImageComparison> = ({ generatedImage }) => {
       <div className="relative w-48 mr-44 mt-[-30px] border rounded-2xl p-1 bg-white">
         <div className="relative bg-gray-200 border border-gray-300 rounded-xl rounded overflow-hidden">
           <Image
-            src="/path_to_user_image"
+            src={drawingUrl}
             width={400}
             height={400}
             alt="User's Drawing"
