@@ -6,7 +6,6 @@ import MintScreen from '@/components/game/MintScreen';
 import NFTScreen from '@/components/game/NFTScreen';
 import Leaderboard from '@/components/game/Leaderboard';
 import AppBar from '@/components/layout/AppBar';
-import Dashboard from '@/components/game/Dashboard';
 
 const Play = () => {
   const [currentScreen, setCurrentScreen] = useState('game'); // Default to 'game'
@@ -77,12 +76,8 @@ const Play = () => {
           onRestart={handleRestartGame} 
         />
       }
-      {currentScreen === 'dashboard' && (
-        <Dashboard 
-          onGoBack={handleGoBack}
-        />
-      )}
-    </div>
+
+  </div>
   );
 };
 
