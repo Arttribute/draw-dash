@@ -76,7 +76,8 @@ const Play = () => {
           onRestart={handleRestartGame} 
         />
       }
-    </div>
+
+  </div>
   );
 };
 
