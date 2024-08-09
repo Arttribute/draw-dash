@@ -15,6 +15,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     const [redoStack, setRedoStack] = useState<string[]>([]);
     const [activeTool, setActiveTool] = useState<'draw' | 'erase'>('draw');
     const [canvasSize, setCanvasSize] = useState({ width, height });
+    const [lineWidth, setLineWidth] = useState(3);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -67,10 +68,10 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         if (ctx) {
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
-          ctx.lineWidth = 3;
+          ctx.lineWidth = lineWidth; // Use initial line width
         }
       }
-    }, []);
+    }, [lineWidth]);
 
     useEffect(() => {
       if (typeof ref === 'function') {
@@ -81,6 +82,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     }, [ref]);
 
     const startDrawing = (event: React.MouseEvent | React.TouchEvent) => {
+      event.preventDefault(); // Prevent scrolling
       if (canvasRef.current) {
         const { offsetX, offsetY } = getEventCoords(event, canvasRef.current);
         const ctx = canvasRef.current.getContext('2d');
@@ -93,12 +95,14 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
     };
 
     const draw = (event: React.MouseEvent | React.TouchEvent) => {
+      event.preventDefault(); // Prevent scrolling
       if (!isDrawing || !canvasRef.current) return;
       const { offsetX, offsetY } = getEventCoords(event, canvasRef.current);
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
         ctx.lineTo(offsetX, offsetY);
         ctx.stroke();
+        ctx.lineWidth = lineWidth;
       }
     };
 
@@ -151,6 +155,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         const ctx = canvasRef.current.getContext('2d');
         if (ctx) {
           ctx.globalCompositeOperation = 'source-over';
+          ctx.lineWidth = lineWidth;
         }
         setActiveTool('draw');
         setIsErasing(false);
@@ -162,7 +167,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         const ctx = canvasRef.current.getContext('2d');
         if (ctx) {
           ctx.globalCompositeOperation = 'destination-out';
-          ctx.lineWidth = eraserSize;
+          ctx.lineWidth = eraserSize; // Use eraser size when erasing
         }
         setActiveTool('erase');
         setIsErasing(true);
@@ -182,7 +187,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
             }
           }}
           className={`border border-gray-300 ${isErasing ? 'cursor-cell' : 'cursor-crosshair'} 
-            w-full h-full`}
+            w-full h-full touch-none select-none`}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
