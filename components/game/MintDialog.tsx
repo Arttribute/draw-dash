@@ -15,25 +15,32 @@ import axios from "axios";
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { set } from "mongoose";
+import { createWalletClient, custom, getContract } from "viem";
+import { mainnet, holesky } from "viem/chains";
+import { ethers } from "ethers";
+import { DrawDashAbi } from "@/lib/abi/DrawDashNFTABI";
+import { useMinipay } from "../providers/MinipayProvider";
+import { useMagicContext } from "../providers/MagicProvider";
 
 export function MintDialog({
   drawingUrl,
   prompt,
+  creationData,
 }: {
   drawingUrl: string;
   prompt: string;
+  creationData: any;
 }) {
   const [promptId, setPromptId] = useState("");
   const [enhancedImage, setEnhancedImage] = useState("");
   const [enhancementStarted, setEnhancementStarted] = useState(false);
   const [loadingEnhancedImage, setLoadingEnhancedImage] = useState(false);
+  const [minting, setMinting] = useState(false);
+  const [creationName, setCreationName] = useState("");
 
-  useEffect(() => {
-    if (promptId !== "" && enhancedImage === "") {
-      getAIImage(promptId, "690204");
-      console.log("getting image..");
-    }
-  }, []);
+  const { minipay } = useMinipay();
+  const { magic } = useMagicContext();
 
   async function generateArt() {
     setPromptId("");
@@ -64,33 +71,98 @@ export function MintDialog({
       const PromptResponse = res.data;
       console.log("Prompt Response", PromptResponse);
       setPromptId(PromptResponse.id);
+      setEnhancedImage("");
       setEnhancementStarted(true);
     } catch (error) {
       console.error("Error in API call:", error);
     }
   }
 
-  async function getAIImage(promptId: string, modelId: string) {
+  useEffect(() => {
+    if (enhancementStarted && enhancedImage === "") {
+      getEnhancedImage();
+    }
+  }, [enhancementStarted]);
+
+  async function getEnhancedImage() {
     try {
       setLoadingEnhancedImage(true);
-      setEnhancedImage("");
       const result = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/generate/image/${promptId}`,
         {
-          params: { model_id: modelId, prompt_id: promptId },
+          params: { model_id: "690204", prompt_id: promptId },
         }
       );
       console.log("result", result);
       const promptImages = result.data.data.images;
 
-      console.log("prompt Images", promptImages);
+      console.log("promptImages", promptImages);
       if (result.data.data.images.length > 0) {
         setEnhancedImage(result.data.data.images[0]);
+        updateCreation(result.data.data.images[0]);
         setLoadingEnhancedImage(false);
-        setEnhancementStarted(false);
+        setMinting(true);
+        await mintArt();
+        setMinting(false);
+      } else {
+        getEnhancedImage();
       }
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  async function updateCreation(enhancedImage_url: string) {
+    const detailsToUpdate = {
+      name: creationName,
+      enhanced_image: enhancedImage_url,
+      minted: true,
+    };
+    console.log("creationDataOnmint", creationData);
+    console.log("detailsToUpdate", detailsToUpdate);
+    const res = await axios.put(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/creations/creation`,
+      {
+        detailsToUpdate,
+      },
+      { params: { id: creationData?._id } }
+    );
+    console.log("res", res);
+  }
+
+  async function mintArt() {
+    const MintAddress = "0x6288541D44Cd7E575711213798dEA5d94417519B";
+    const tokenUri = "https://mosaicsnft.com/api/metadata/1";
+
+    if (minipay) {
+      const walletClient = createWalletClient({
+        chain: mainnet,
+        transport: custom((window as any).ethereum!),
+      });
+
+      const contract = getContract({
+        address: MintAddress,
+        abi: DrawDashAbi,
+        client: {
+          wallet: walletClient,
+        },
+      });
+
+      const [address] = await walletClient.getAddresses();
+
+      const hash = await contract.write.mintNFT([address, tokenUri]);
+      console.log("hash", hash);
+    } else if (magic) {
+      const provider = new ethers.BrowserProvider(magic.rpcProvider);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+
+      const contract = new ethers.Contract(MintAddress, DrawDashAbi, signer);
+
+      const hash = await contract.mintNFT(address, tokenUri);
+      console.log("hash", hash);
+    } else {
+      throw new Error("No wallet provider found");
     }
   }
 
@@ -128,19 +200,27 @@ export function MintDialog({
             />
           )}
         </div>
-        <Input id="name" placeholder="Name your creation" />
+        <Input
+          id="name"
+          placeholder="Name your creation"
+          onChange={(event) => {
+            setCreationName(event.target.value);
+          }}
+          value={creationName}
+        />
 
         <DialogFooter>
-          {!loadingEnhancedImage && (
-            <Button type="submit" className="w-full" onClick={generateArt}>
-              Enhance and mint
-            </Button>
-          )}
-          {loadingEnhancedImage && (
-            <Button type="submit" className="w-full" disabled>
-              Enhancing...
-            </Button>
-          )}
+          <Button
+            className="w-full"
+            disabled={minting || loadingEnhancedImage}
+            onClick={generateArt}
+          >
+            {minting
+              ? "Minting..."
+              : loadingEnhancedImage
+              ? "Enhancing..."
+              : "Enhance and mint"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
