@@ -89,7 +89,7 @@ export function MintDialog({
       console.log("promptImages", promptImages);
       if (result.data.data.images.length > 0) {
         setEnhancedImage(result.data.data.images[0]);
-        updateCreation();
+        updateCreation(result.data.data.images[0]);
         setLoadingEnhancedImage(false);
       } else {
         getEnhancedImage();
@@ -99,12 +99,13 @@ export function MintDialog({
     }
   }
 
-  async function updateCreation() {
+  async function updateCreation(enhancedImage_url: string) {
     const detailsToUpdate = {
       name: creationName,
-      enhancedImage: enhancedImage,
+      enhanced_image: enhancedImage_url,
     };
     console.log("creationDataOnmint", creationData);
+    console.log("detailsToUpdate", detailsToUpdate);
     const res = await axios.put(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/creations/creation`,
       {
