@@ -83,9 +83,9 @@ const Home = () => {
           <h2 className="text-2xl font-bold mb-4">Games from the Community</h2>
           <ImageDisplay games={games} />
         </section>
-        <section className="my-12 mx-6 ">
+        {/* <section className="my-12 mx-6 ">
           <WorldCard />
-        </section>
+        </section> */}
       </main>
     </div>
   );
