@@ -20,6 +20,9 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     event EarningsWithdrawn(address indexed seller, uint256 amount);
     event ListingPriceUpdated(uint256 oldPrice, uint256 newPrice);
 
+    constructor() Ownable(msg.sender) ReentrancyGuard() {
+    }
+
     // Function to update listing price
     function setListingPrice(uint256 _listingPrice) external onlyOwner {
         uint256 oldPrice = listingPrice;
