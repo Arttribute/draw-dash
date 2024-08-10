@@ -15,25 +15,22 @@ import axios from "axios";
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { set } from "mongoose";
 
 export function MintDialog({
   drawingUrl,
   prompt,
+  creationData,
 }: {
   drawingUrl: string;
   prompt: string;
+  creationData: any;
 }) {
   const [promptId, setPromptId] = useState("");
   const [enhancedImage, setEnhancedImage] = useState("");
   const [enhancementStarted, setEnhancementStarted] = useState(false);
   const [loadingEnhancedImage, setLoadingEnhancedImage] = useState(false);
-
-  useEffect(() => {
-    if (promptId !== "" && enhancedImage === "") {
-      getAIImage(promptId, "690204");
-      console.log("getting image..");
-    }
-  }, []);
+  const [creationName, setCreationName] = useState("");
 
   async function generateArt() {
     setPromptId("");
@@ -64,34 +61,58 @@ export function MintDialog({
       const PromptResponse = res.data;
       console.log("Prompt Response", PromptResponse);
       setPromptId(PromptResponse.id);
+      setEnhancedImage("");
       setEnhancementStarted(true);
     } catch (error) {
       console.error("Error in API call:", error);
     }
   }
 
-  async function getAIImage(promptId: string, modelId: string) {
+  useEffect(() => {
+    if (enhancementStarted && enhancedImage === "") {
+      getEnhancedImage();
+    }
+  }, [enhancementStarted]);
+
+  async function getEnhancedImage() {
     try {
       setLoadingEnhancedImage(true);
-      setEnhancedImage("");
       const result = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/generate/image/${promptId}`,
         {
-          params: { model_id: modelId, prompt_id: promptId },
+          params: { model_id: "690204", prompt_id: promptId },
         }
       );
       console.log("result", result);
       const promptImages = result.data.data.images;
 
-      console.log("prompt Images", promptImages);
+      console.log("promptImages", promptImages);
       if (result.data.data.images.length > 0) {
         setEnhancedImage(result.data.data.images[0]);
+        updateCreation();
         setLoadingEnhancedImage(false);
-        setEnhancementStarted(false);
+      } else {
+        getEnhancedImage();
       }
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async function updateCreation() {
+    const detailsToUpdate = {
+      name: creationName,
+      enhancedImage: enhancedImage,
+    };
+    console.log("creationDataOnmint", creationData);
+    const res = await axios.put(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/creations/creation`,
+      {
+        detailsToUpdate,
+      },
+      { params: { id: creationData?._id } }
+    );
+    console.log("res", res);
   }
 
   return (
@@ -128,7 +149,14 @@ export function MintDialog({
             />
           )}
         </div>
-        <Input id="name" placeholder="Name your creation" />
+        <Input
+          id="name"
+          placeholder="Name your creation"
+          onChange={(event) => {
+            setCreationName(event.target.value);
+          }}
+          value={creationName}
+        />
 
         <DialogFooter>
           {!loadingEnhancedImage && (
