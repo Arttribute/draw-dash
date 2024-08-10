@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import AppBar from "../components/layout/AppBar";
 import CustomCard from "../components/ui/CustomCard";
 import ImagePlaceholder from "../components/ui/ImagePlaceholder";
@@ -6,30 +7,34 @@ import ImageDisplay from "../components/ui/ImageDisplay";
 import { Button } from "../components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import CreationCard from "@/components/nft/CreationCard";
 
 const Home = () => {
-  const games = [
-    {
-      title: "Test Game 1",
-      author: "by Author1",
-      imageUrl: "/assets/cat2.jpeg",
-    },
-    {
-      title: "Test Game 2",
-      author: "by Author2",
-      imageUrl: "/assets/cat2.jpeg",
-    },
-    {
-      title: "Test Game 3",
-      author: "by Author3",
-      imageUrl: "/assets/cat3.jpeg",
-    },
-    {
-      title: "Test Game 4",
-      author: "by Author4",
-      imageUrl: "/assets/cat4.jpeg",
-    },
-  ];
+  const [creations, setCreations] = useState([]);
+  const [loadinigCreations, setLoadingCreations] = useState(false);
+  const [account, setAccount] = useState(null);
+  const [loadedAccount, setLoadedAccount] = useState(false);
+
+  const getCreations = async () => {
+    setLoadingCreations(true);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/creations`,
+      {
+        next: { revalidate: 5 },
+      }
+    );
+    const data = await res.json();
+    setCreations(data);
+    setLoadingCreations(false);
+  };
+
+  useEffect(() => {
+    const userJson = localStorage.getItem("user");
+    const user = userJson ? JSON.parse(userJson) : null;
+    setLoadedAccount(true);
+    setAccount(user);
+    getCreations();
+  }, []);
 
   return (
     <div>
@@ -80,8 +85,15 @@ const Home = () => {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-4">Games from the Community</h2>
-          <ImageDisplay games={games} />
+          <h2 className="text-2xl font-bold mb-4">
+            Creations from the Community
+          </h2>
+          {creations &&
+            creations.map((creation: any) => (
+              <div className="col-span-6 lg:col-span-3" key={creation._id}>
+                <CreationCard creation={creation} account={account} />
+              </div>
+            ))}
         </section>
       </main>
     </div>
