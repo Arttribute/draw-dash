@@ -8,11 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RequireAuthPlaceholder from "@/components/account/RequireAuthPlaceHolder";
 import { LoaderCircle } from "lucide-react";
 
-import GameCard from "@/components/nft/CreationCard";
+import CreationCard from "@/components/nft/CreationCard";
 
 export default function Games() {
   const [creations, setCreations] = useState([]);
   const [myCreations, setMyCreations] = useState([]);
+  const [listedCreations, setListedCreations] = useState([]);
   const [account, setAccount] = useState(null);
   const [loadinigCreations, setLoadingCreations] = useState(false);
   const [loadedAccount, setLoadedAccount] = useState(false);
@@ -36,6 +37,12 @@ export default function Games() {
       setMyCreations(myCreations);
       console.log("myCreations", myCreations);
     }
+
+    const listedCreations = data.filter(
+      (creation: any) => creation.listed === true
+    );
+    setListedCreations(listedCreations);
+
     setLoadingCreations(false);
   };
 
@@ -53,9 +60,12 @@ export default function Games() {
       <div className="flex flex-col items-center justify-center w-full mt-20">
         <Tabs defaultValue="all-creations">
           <div className="flex flex-col items-center justify-center ">
-            <TabsList className="grid  grid-cols-2 w-96 mb-2">
+            <TabsList className="grid  grid-cols-3  mb-2">
               <TabsTrigger value="all-creations" className="font-semibold">
                 All creations
+              </TabsTrigger>
+              <TabsTrigger value="for-sale" className="font-semibold">
+                Creations for Sale
               </TabsTrigger>
               <TabsTrigger value="my-creations" className="font-semibold">
                 My creations
@@ -72,9 +82,32 @@ export default function Games() {
               {creations &&
                 creations.map((creation: any) => (
                   <div className="col-span-6 lg:col-span-3" key={creation._id}>
-                    <GameCard creation={creation} />
+                    <CreationCard creation={creation} account={account} />
                   </div>
                 ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="for-sale">
+            <div className="grid grid-cols-12 gap-2 p-4">
+              {loadinigCreations && (
+                <div className="col-span-12 flex flex-col items-center justify-center mt-6">
+                  <LoaderCircle size={32} className="animate-spin" />
+                </div>
+              )}
+              {listedCreations &&
+                listedCreations.map((creation: any) => (
+                  <div className="col-span-6 lg:col-span-3" key={creation._id}>
+                    <CreationCard creation={creation} account={account} />
+                  </div>
+                ))}
+
+              {listedCreations.length === 0 && (
+                <div className="col-span-12 text-center mt-6">
+                  <div className="text-2xl font-semibold text-gray-500">
+                    No creations for sale...
+                  </div>
+                </div>
+              )}
             </div>
           </TabsContent>
           <TabsContent value="my-creations">
@@ -96,7 +129,7 @@ export default function Games() {
               {myCreations &&
                 myCreations.map((creation: any) => (
                   <div className="col-span-6 lg:col-span-3" key={creation._id}>
-                    <GameCard creation={creation} />
+                    <CreationCard creation={creation} account={account} />
                   </div>
                 ))}
 
