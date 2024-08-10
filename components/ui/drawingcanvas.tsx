@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect, ForwardedRef } from 'react';
-import { FaPen, FaEraser } from 'react-icons/fa';
-import MyToolBar from './toolbar';
+import React, { useState, useRef, useEffect, ForwardedRef } from "react";
+import MyToolBar from "./toolbar";
 
 interface DrawingCanvasProps {
   width?: number;
@@ -9,79 +8,139 @@ interface DrawingCanvasProps {
 }
 
 const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
-  ({ width = 500, height = 400, eraserSize = 10 }, ref: ForwardedRef<HTMLCanvasElement>) => {
+  (
+    { width = 500, height = 400, eraserSize = 10 },
+    ref: ForwardedRef<HTMLCanvasElement>
+  ) => {
     const [isDrawing, setIsDrawing] = useState(false);
     const [isErasing, setIsErasing] = useState(false);
     const [undoStack, setUndoStack] = useState<string[]>([]);
     const [redoStack, setRedoStack] = useState<string[]>([]);
+    const [activeTool, setActiveTool] = useState<"draw" | "erase">("draw");
+    const [canvasSize, setCanvasSize] = useState({ width, height });
+    const [lineWidth, setLineWidth] = useState(3);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    useEffect(() => {
-      if (canvasRef.current) {
-        const ctx = canvasRef.current.getContext('2d');
+    // Utility function to get the correct coordinates for mouse and touch events
+    const getEventCoords = (
+      event: React.MouseEvent | React.TouchEvent,
+      canvas: HTMLCanvasElement
+    ) => {
+      let offsetX: number;
+      let offsetY: number;
+
+      if ("touches" in event) {
+        const touch = event.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+      } else {
+        offsetX = event.nativeEvent.offsetX;
+        offsetY = event.nativeEvent.offsetY;
+      }
+
+      return { offsetX, offsetY };
+    };
+
+    const resizeCanvas = (canvas: HTMLCanvasElement) => {
+      const parent = canvas?.parentElement;
+      if (parent) {
+        const { clientWidth, clientHeight } = parent;
+        setCanvasSize({ width: clientWidth, height: clientHeight });
+        const ctx = canvas.getContext("2d");
         if (ctx) {
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-          ctx.lineWidth = 5;
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          canvas.width = clientWidth;
+          canvas.height = clientHeight;
+          ctx.putImageData(imageData, 0, 0);
         }
       }
+    };
+
+    useEffect(() => {
+      if (canvasRef.current) {
+        resizeCanvas(canvasRef.current);
+        window.addEventListener("resize", () =>
+          resizeCanvas(canvasRef.current!)
+        );
+      }
+      return () => {
+        window.removeEventListener("resize", () =>
+          resizeCanvas(canvasRef.current!)
+        );
+      };
     }, []);
 
     useEffect(() => {
-      if (typeof ref === 'function') {
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext("2d");
+        if (ctx) {
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.lineWidth = lineWidth; // Use initial line width
+        }
+      }
+    }, [lineWidth]);
+
+    useEffect(() => {
+      if (typeof ref === "function") {
         ref(canvasRef.current);
       } else if (ref) {
         ref.current = canvasRef.current;
       }
     }, [ref]);
 
-    const startDrawing = ({ nativeEvent }: React.MouseEvent) => {
+    const startDrawing = (event: React.MouseEvent | React.TouchEvent) => {
+      event.preventDefault(); // Prevent scrolling
       if (canvasRef.current) {
-        const { offsetX, offsetY } = nativeEvent;
-        const ctx = canvasRef.current.getContext('2d');
+        const { offsetX, offsetY } = getEventCoords(event, canvasRef.current);
+        const ctx = canvasRef.current.getContext("2d");
         if (ctx) {
           ctx.beginPath();
           ctx.moveTo(offsetX, offsetY);
           setIsDrawing(true);
-          setIsErasing(false);
         }
       }
     };
 
-    const draw = ({ nativeEvent }: React.MouseEvent) => {
+    const draw = (event: React.MouseEvent | React.TouchEvent) => {
+      event.preventDefault(); // Prevent scrolling
       if (!isDrawing || !canvasRef.current) return;
-      const { offsetX, offsetY } = nativeEvent;
-      const ctx = canvasRef.current.getContext('2d');
+      const { offsetX, offsetY } = getEventCoords(event, canvasRef.current);
+      const ctx = canvasRef.current.getContext("2d");
       if (ctx) {
         ctx.lineTo(offsetX, offsetY);
         ctx.stroke();
+        ctx.lineWidth = lineWidth;
       }
     };
 
     const stopDrawing = () => {
-      if (canvasRef.current) {
-        if (isDrawing || isErasing) {
-          setIsDrawing(false);
-          setIsErasing(false);
-          setUndoStack([...undoStack, canvasRef.current.toDataURL()]);
-          setRedoStack([]);
-        }
+      if (canvasRef.current && isDrawing) {
+        setIsDrawing(false);
+        setUndoStack([...undoStack, canvasRef.current.toDataURL()]);
+        setRedoStack([]);
       }
     };
 
     const handleUndo = () => {
       if (canvasRef.current && undoStack.length > 0) {
-        const ctx = canvasRef.current.getContext('2d');
+        const ctx = canvasRef.current!.getContext("2d");
         const lastState = undoStack.pop()!;
-        setRedoStack([...redoStack, canvasRef.current.toDataURL()]);
+        setRedoStack([...redoStack, canvasRef.current!.toDataURL()]);
         setUndoStack([...undoStack]);
 
         const img = new Image();
         img.src = lastState;
         img.onload = () => {
           if (ctx) {
-            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            ctx.clearRect(
+              0,
+              0,
+              canvasRef.current!.width,
+              canvasRef.current!.height
+            );
             ctx.drawImage(img, 0, 0);
           }
         };
@@ -90,7 +149,7 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
 
     const handleRedo = () => {
       if (canvasRef.current && redoStack.length > 0) {
-        const ctx = canvasRef.current.getContext('2d');
+        const ctx = canvasRef.current.getContext("2d");
         const nextState = redoStack.pop()!;
         setUndoStack([...undoStack, canvasRef.current.toDataURL()]);
         setRedoStack([...redoStack]);
@@ -99,7 +158,12 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         img.src = nextState;
         img.onload = () => {
           if (ctx) {
-            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            ctx.clearRect(
+              0,
+              0,
+              canvasRef.current!.width,
+              canvasRef.current!.height
+            );
             ctx.drawImage(img, 0, 0);
           }
         };
@@ -108,55 +172,68 @@ const DrawingCanvas = React.forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
 
     const handleDraw = () => {
       if (canvasRef.current) {
-        const ctx = canvasRef.current.getContext('2d');
+        const ctx = canvasRef.current.getContext("2d");
         if (ctx) {
-          ctx.globalCompositeOperation = 'source-over'; // Draw mode
+          ctx.globalCompositeOperation = "source-over";
+          ctx.lineWidth = lineWidth;
         }
-        setIsDrawing(true);
+        setActiveTool("draw");
         setIsErasing(false);
       }
     };
 
     const handleErase = () => {
       if (canvasRef.current) {
-        const ctx = canvasRef.current.getContext('2d');
+        const ctx = canvasRef.current.getContext("2d");
         if (ctx) {
-          ctx.globalCompositeOperation = 'destination-out'; // Erase mode
-          ctx.lineWidth = eraserSize; // Set eraser size
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.lineWidth = eraserSize; // Use eraser size when erasing
         }
-        setIsDrawing(false);
+        setActiveTool("erase");
         setIsErasing(true);
+        setIsDrawing(false);
       }
     };
 
     return (
-      <div className="relative">
+      <div className="relative w-full h-full">
+        <div className="-mb-10">
+          <MyToolBar
+            handleDraw={handleDraw}
+            handleErase={handleErase}
+            handleUndo={handleUndo}
+            handleRedo={handleRedo}
+            activeTool={activeTool}
+          />
+        </div>
         <canvas
           ref={(node) => {
             canvasRef.current = node;
-            if (typeof ref === 'function') {
+            if (typeof ref === "function") {
               ref(node);
             } else if (ref) {
               ref.current = node;
             }
           }}
-          width={width}
-          height={height}
-          className="border border-gray-300"
+          className={`border border-gray-300 rounded-xl ${
+            isErasing ? "cursor-cell" : "cursor-crosshair"
+          } 
+            w-full h-full touch-none select-none`}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
-        />
-        <MyToolBar
-          handleDraw={handleDraw}
-          handleErase={handleErase}
-          handleUndo={handleUndo}
-          handleRedo={handleRedo}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+          width={canvasSize.width}
+          height={canvasSize.height}
         />
       </div>
     );
   }
 );
+
+DrawingCanvas.displayName = "DrawingCanvas";
 
 export default DrawingCanvas;

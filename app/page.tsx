@@ -1,14 +1,36 @@
 import React from "react";
 import AppBar from "../components/layout/AppBar";
-import CustomCard from "../components/game/CustomCard";
-import ImagePlaceholder from "../components/game/ImagePlaceholder";
+import CustomCard from "../components/ui/CustomCard";
+import ImagePlaceholder from "../components/ui/ImagePlaceholder";
+import ImageDisplay from "../components/ui/ImageDisplay";
 import { Button } from "../components/ui/button";
-import AccountMenu from "@/components/account/AccountMenu";
 import Link from "next/link";
 import Image from "next/image";
-import WorldCard from "@/components/game/WorldCard";
 
 const Home = () => {
+  const games = [
+    {
+      title: "Test Game 1",
+      author: "by Author1",
+      imageUrl: "/assets/cat2.jpeg",
+    },
+    {
+      title: "Test Game 2",
+      author: "by Author2",
+      imageUrl: "/assets/cat2.jpeg",
+    },
+    {
+      title: "Test Game 3",
+      author: "by Author3",
+      imageUrl: "/assets/cat3.jpeg",
+    },
+    {
+      title: "Test Game 4",
+      author: "by Author4",
+      imageUrl: "/assets/cat4.jpeg",
+    },
+  ];
+
   return (
     <div>
       <AppBar />
@@ -45,9 +67,9 @@ const Home = () => {
         <section className="my-12 mx-6 ">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <CustomCard
-              title="Compete and Earn"
+              title="Play and Earn"
               description="Show off your drawing skills by competing against others. Earn points and rewards based on how close your sketch is to the generated image."
-              buttonLabel="Join Now"
+              buttonLabel="Deposit"
             />
             <CustomCard
               title="NFT Marketplace"
@@ -57,17 +79,9 @@ const Home = () => {
           </div>
         </section>
 
-        <section className="my-12 mx-6 ">
-          <h2 className="text-2xl font-bold mb-4">Community Creations</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-            {[1, 2, 3, 4].map((_, index) => (
-              <ImagePlaceholder key={index} />
-            ))}
-          </div>
-        </section>
-
-        <section className="my-12 mx-6 ">
-          <AccountMenu />
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Games from the Community</h2>
+          <ImageDisplay games={games} />
         </section>
         <section className="my-12 mx-6 ">
           <WorldCard />
