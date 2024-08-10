@@ -11,22 +11,16 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
 
-    // Get the two images from the form data
-    const query_image = formData.get("query_image") as File;
-    const ans_image = formData.get("ans_image") as File;
-
-    // Create Blobs from the images
-    const query_image_blob = new Blob([query_image], {
-      type: query_image.type,
-    });
-    const ans_image_blob = new Blob([ans_image], { type: ans_image.type });
+    // Get the two image URLs from the form data
+    const query_image = formData.get("query_image") as string;
+    const ans_image = formData.get("ans_image") as string;
 
     const [processor, vision_model]: [Processor, PreTrainedModel] =
       await ApplicationSingleton.getInstance();
 
     // Read the two images as raw images
-    const rawImageQuery = await RawImage.fromBlob(query_image_blob);
-    const rawImageAns = await RawImage.fromBlob(ans_image_blob);
+    const rawImageQuery = await RawImage.fromURL(query_image);
+    const rawImageAns = await RawImage.fromURL(ans_image);
 
     // Tokenize the two images
     const tokenizedImageQuery = await processor(rawImageQuery);
