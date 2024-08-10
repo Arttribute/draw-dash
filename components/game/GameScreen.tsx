@@ -4,14 +4,16 @@ import { Button } from "../ui/button";
 import ScoreDisplay from "./ScoreDisplay";
 import DrawingCanvas from "../ui/drawingcanvas";
 import GameTimer from "./GameTimer";
-import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
+import MultiplierDisplay from "./MultiplierDisplay";
 
 interface GameScreenProps {
   onComplete: () => void;
   setPromptId: any;
   setImagePrompt: any;
   setDrawingUrl: any;
+  isPlayToEarn: boolean;
+  depositAmount: any;
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({
@@ -19,6 +21,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
   setPromptId,
   setImagePrompt,
   setDrawingUrl,
+  isPlayToEarn,
+  depositAmount,
 }) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -132,11 +136,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
   return (
     <div className="grid grid-cols-12 gap-2 flex flex-col  justify-center p-4 md:p-8 lg:p-12 lg:w-[600px]">
-      <div className="lg:hidden flex col-span-12 ">
+      <div className="lg:hidden flex col-span-12  mt-6">
         <div className="w-16 ">
           <ScoreDisplay score={score} />
         </div>
 
+        {isPlayToEarn && <MultiplierDisplay multiplier={1.5} />}
         <div className="w-16 ml-auto">
           <GameTimer
             initialSeconds={60}
@@ -173,7 +178,17 @@ const GameScreen: React.FC<GameScreenProps> = ({
         </div>
         <div className="mt-4 border rounded-xl p-2">
           <ScoreDisplay score={score} />
-        </div>
+        </div>{" "}
+        {isPlayToEarn && (
+          <>
+            <p className="mt-4 text-xs text-center p-1 text-green-600 font-semibold">
+              {depositAmount} $
+            </p>
+            <div className=" border border-blue-300 text-center rounded-xl py-3">
+              <MultiplierDisplay multiplier={1.5} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

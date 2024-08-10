@@ -6,14 +6,18 @@ import MintScreen from "@/components/game/MintScreen";
 import NFTScreen from "@/components/game/NFTScreen";
 import Leaderboard from "@/components/game/Leaderboard";
 import AppBar from "@/components/layout/AppBar";
+import StartGameScreen from "@/components/game/StartGameScreen";
 
 const Play = () => {
-  const [currentScreen, setCurrentScreen] = useState("game"); // Default to 'game'
+  const [currentScreen, setCurrentScreen] = useState("start"); // Default to 'game'
   const [promptId, setPromptId] = useState("");
   const [modelId, setModelId] = useState("690204");
   const [drawingUrl, setDrawingUrl] = useState("");
   const [similarity, setSimilarity] = useState(0);
   const [imagePrompt, setImagePrompt] = useState("");
+  const [isPlayToEarn, setIsPlayToEarn] = useState(false);
+  const [multiplier, setMultiplier] = useState(0);
+  const [depositAmount, setDepositAmount] = useState(0);
 
   const handleGameScreenComplete = () => {
     setCurrentScreen("match");
@@ -23,8 +27,8 @@ const Play = () => {
     setCurrentScreen("mint");
   };
 
-  const handleMintScreenComplete = () => {
-    setCurrentScreen("nft");
+  const handleStartGame = () => {
+    setCurrentScreen("game");
   };
 
   const handleNFTScreenComplete = () => {
@@ -62,14 +66,24 @@ const Play = () => {
   return (
     <div>
       <AppBar />
-      1234567
+
       <div className="flex flex-col items-center justify-center mt-8 ">
+        {currentScreen === "start" && (
+          <StartGameScreen
+            onComplete={handleStartGame}
+            setIsPlayToEarn={setIsPlayToEarn}
+            setDepositAmount={setDepositAmount}
+            depositAmount={depositAmount}
+          />
+        )}
         {currentScreen === "game" && (
           <GameScreen
             onComplete={handleGameScreenComplete}
             setPromptId={setPromptId}
             setDrawingUrl={setDrawingUrl}
             setImagePrompt={setImagePrompt}
+            isPlayToEarn={isPlayToEarn}
+            depositAmount={depositAmount}
           />
         )}
         {currentScreen === "match" && (
