@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import GameScreen from "@/components/game/GameScreen";
 import MatchScreen from "@/components/game/MatchScreen";
@@ -7,6 +8,7 @@ import NFTScreen from "@/components/game/NFTScreen";
 import Leaderboard from "@/components/game/Leaderboard";
 import AppBar from "@/components/layout/AppBar";
 import StartGameScreen from "@/components/game/StartGameScreen";
+
 
 const Play = () => {
   const [currentScreen, setCurrentScreen] = useState("start"); // Default to 'game'
@@ -98,6 +100,7 @@ const Play = () => {
           />
         )}
       </div>
+
     </div>
   );
 };
