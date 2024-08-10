@@ -1,14 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GameScreen from "@/components/game/GameScreen";
 import MatchScreen from "@/components/game/MatchScreen";
-import MintScreen from "@/components/game/MintScreen";
-import NFTScreen from "@/components/game/NFTScreen";
-import Leaderboard from "@/components/game/Leaderboard";
 import AppBar from "@/components/layout/AppBar";
 import StartGameScreen from "@/components/game/StartGameScreen";
-
+import { User } from "@/models/User";
 
 const Play = () => {
   const [currentScreen, setCurrentScreen] = useState("start"); // Default to 'game'
@@ -20,6 +17,7 @@ const Play = () => {
   const [isPlayToEarn, setIsPlayToEarn] = useState(false);
   const [multiplier, setMultiplier] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
+  const [creationData, setCreationData] = useState<any>({});
 
   const handleGameScreenComplete = () => {
     setCurrentScreen("match");
@@ -65,6 +63,17 @@ const Play = () => {
     setCurrentScreen("game");
   };
 
+  const [loaded, setLoaded] = useState(false);
+  const [loadedAccount, setLoadedAccount] = useState(true);
+  const [account, setAccount] = useState<User | null>(null);
+
+  useEffect(() => {
+    const userJson = localStorage.getItem("user");
+    const user = userJson ? JSON.parse(userJson) : null;
+    setLoadedAccount(true);
+    setAccount(user);
+  }, [loaded]);
+
   return (
     <div>
       <AppBar />
@@ -86,6 +95,8 @@ const Play = () => {
             setImagePrompt={setImagePrompt}
             isPlayToEarn={isPlayToEarn}
             depositAmount={depositAmount}
+            account={account}
+            setCreationData={setCreationData}
           />
         )}
         {currentScreen === "match" && (
@@ -97,10 +108,10 @@ const Play = () => {
             drawingUrl={drawingUrl}
             similarity={similarity}
             setSimilarity={setSimilarity}
+            creationData={creationData}
           />
         )}
       </div>
-
     </div>
   );
 };

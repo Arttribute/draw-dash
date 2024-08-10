@@ -14,6 +14,8 @@ interface GameScreenProps {
   setDrawingUrl: any;
   isPlayToEarn: boolean;
   depositAmount: any;
+  account: any;
+  setCreationData: any;
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({
@@ -23,6 +25,8 @@ const GameScreen: React.FC<GameScreenProps> = ({
   setDrawingUrl,
   isPlayToEarn,
   depositAmount,
+  account,
+  setCreationData,
 }) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -70,6 +74,20 @@ const GameScreen: React.FC<GameScreenProps> = ({
               );
               const uploadedFile = res.data;
               setDrawingUrl(uploadedFile.secure_url);
+
+              //save creation to db
+              const creationData = {
+                drawing_url: uploadedFile.secure_url,
+                prompt: generatedText,
+                owner: account?._id,
+                time_taken: 60 - secondsLeft,
+              };
+              console.log("creationData", creationData);
+              const creationRes = await axios.post("/api/creations", {
+                creationData,
+              });
+              console.log("creationRes", creationRes.data);
+              setCreationData(creationRes.data);
             }
           }, "image/png");
         }

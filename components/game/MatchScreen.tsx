@@ -15,6 +15,7 @@ interface MatchScreenProps {
   drawingUrl: string;
   similarity: number;
   setSimilarity: any;
+  creationData: any;
 }
 
 const MatchScreen: React.FC<MatchScreenProps> = ({
@@ -25,6 +26,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   drawingUrl,
   similarity,
   setSimilarity,
+  creationData,
 }) => {
   const [generatedImage, setGeneratedImage] = useState("");
   const [loadingComaprison, setLoadingComparison] = useState(false);
@@ -112,7 +114,11 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
           />
           {/* Mint Button */}
           <div className="flex justify-center w-full mt-6">
-            <MintDialog drawingUrl={drawingUrl} prompt={imagePrompt} />
+            <MintDialog
+              drawingUrl={drawingUrl}
+              prompt={imagePrompt}
+              creationData={creationData}
+            />
           </div>
           <div className="flex justify-center w-full">
             <Button
