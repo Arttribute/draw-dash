@@ -136,6 +136,7 @@ export function MintDialog({
     const tokenUri = "https://mosaicsnft.com/api/metadata/1";
 
     if (minipay) {
+      // TODO: Fix this... quite buggy
       const walletClient = createWalletClient({
         chain: mainnet,
         transport: custom((window as any).ethereum!),
