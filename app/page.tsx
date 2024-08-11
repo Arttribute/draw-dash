@@ -27,7 +27,7 @@ const Home = () => {
     {
       title: "Test Game 4",
       author: "by Author4",
-      imageUrl: "/assets/cat4.jpeg",
+      imageUrl: "/assets/cat4.jpg",
     },
   ];
 
