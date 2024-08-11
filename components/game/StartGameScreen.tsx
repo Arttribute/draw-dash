@@ -60,8 +60,8 @@ const StartGameScreen: React.FC<StartGameScreenProps> = ({
                 </h4>
                 <div className=" p-2">
                   <p className="text-sm mb-4 ml-2 ">
-                    Play AI art puzzles just for fun. Compete on the global
-                    leaderboard and earn an NFT for puzzles you solve.
+                    Draw to solve AI art puzzles just for fun. Compete on the
+                    global leaderboard and earn NFTs.
                   </p>
                 </div>
               </div>
@@ -85,12 +85,12 @@ const StartGameScreen: React.FC<StartGameScreenProps> = ({
             <CardContent>
               <div className="m-2">
                 <h4 className="text-lg font-semibold mb-4">
-                  Stake, play and earn rewards
+                  Deposit, Sketch and Earn
                 </h4>
                 <div className="p-2">
                   <p className="text-sm mb-4 ml-2">
-                    Stake your FIL and play the AI art puzzle game to earn
-                    rewards and NFTs. The more you play, the more you earn.
+                    Deposit your USDc and play the AI art puzzle game to earn
+                    rewards based on your performance.
                   </p>
                 </div>
               </div>
