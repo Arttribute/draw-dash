@@ -14,19 +14,11 @@ import Image from "next/image";
 import axios from "axios";
 
 import { useState, useEffect } from "react";
-import {
-  createPublicClient,
-  createWalletClient,
-  custom,
-  getContract,
-  http,
-} from "viem";
-import { mainnet, holesky } from "viem/chains";
-import { ethers } from "ethers";
+import { createWalletClient, custom } from "viem";
 import { DrawDashAbi } from "@/lib/abi/DrawDashNFTABI";
 import { useMinipay } from "../providers/MinipayProvider";
 import { useMagicContext } from "../providers/MagicProvider";
-import { privateKeyToAccount } from "viem/accounts";
+import { dango } from "@/lib/dango";
 
 export function MintDialog({
   drawingUrl,
@@ -149,14 +141,8 @@ export function MintDialog({
     const tokenUri = "https://mosaicsnft.com/api/metadata/1";
 
     if (minipay) {
-      // TODO: Fix this... quite buggy
-      const publicClient = createPublicClient({
-        chain: mainnet,
-        transport: http(),
-      });
-
       const walletClient = createWalletClient({
-        chain: mainnet,
+        chain: dango,
         transport: custom((window as any).ethereum!),
       });
 
