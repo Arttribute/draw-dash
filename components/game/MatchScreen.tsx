@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import { Button } from "../ui/button";
 import ImageComparison from "../ui/imagecomparison";
 import { MintDialog } from "./MintDialog";
@@ -16,6 +16,7 @@ interface MatchScreenProps {
   similarity: number;
   setSimilarity: any;
   creationData: any;
+  timeTaken: number;
 }
 
 const MatchScreen: React.FC<MatchScreenProps> = ({
@@ -27,9 +28,11 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   similarity,
   setSimilarity,
   creationData,
+  timeTaken,
 }) => {
   const [generatedImage, setGeneratedImage] = useState("");
   const [loadingComaprison, setLoadingComparison] = useState(false);
+  const [score, setScore] = useState(0);
 
   const handleMintButtonClick = () => {
     onComplete(); // Trigger the transition to the MintScreen
@@ -38,6 +41,19 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   useEffect(() => {
     getAIImage(promptId, modelId);
   }, []);
+
+  useEffect(() => {
+    if (similarity > 0) {
+      calculateScore();
+    }
+  }, [similarity]);
+
+  const calculateScore = () => {
+    const timePenalty = timeTaken > 60 ? 0 : 60 - timeTaken;
+    const similarityScore = similarity * 100;
+    const score = similarityScore - timePenalty;
+    setScore(score);
+  };
 
   useEffect(() => {
     if (generatedImage !== "" && drawingUrl !== "") {
@@ -92,7 +108,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
         <div className="relative z-10">
           <div className="text-center mb-4">
             <p className="text-xl font-semibold text-gray-800">
-              Score: <span className="text-green-600">85%</span>
+              Score: <span className="text-green-600">{score}</span>
             </p>
           </div>
           <div className="flex items-center justify-center">
@@ -103,7 +119,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
               <p className="text-xs font-semibold text-gray-800">similarity</p>
             </div>
             <div className="text-center mb-4 ">
-              <span className="text-sm text-green-600">60 sec</span>
+              <span className="text-sm text-green-600">{timeTaken} sec</span>
               <p className="text-xs font-semibold text-gray-800">time taken</p>
             </div>
           </div>
@@ -118,6 +134,8 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
               drawingUrl={drawingUrl}
               prompt={imagePrompt}
               creationData={creationData}
+              score={score}
+              similarity={similarity}
             />
           </div>
           <div className="flex justify-center w-full">
