@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import Router from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
 
@@ -38,7 +38,7 @@ export function MintDialog({
   const [isMinted, setIsMinted] = useState(false);
   const [creationName, setCreationName] = useState("");
 
-  const router = Router.useRouter();
+  const router = useRouter();
 
   const { minipay } = useMinipay();
   const { web3 } = useMagicContext();
