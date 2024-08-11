@@ -57,9 +57,9 @@ const Home = () => {
               </h1>
 
               <p className="text-xs lg:text-lg mb-4 lg:mb-8 font-medium tracking-tight">
-                Sketch Your Way to Victory. Given a prompt, you must sketch an
-                image as close as possible to the hidden generated image within
-                a given time. Play, mint NFTs and earn rewards.
+                Sketch Your Way to Victory. Given a prompt, your task is to
+                sketch an image as close as possible to the hidden generated
+                image within a given time. Play, mint NFTs and earn rewards.
               </p>
 
               <div className="flex space-x-4">
@@ -92,9 +92,11 @@ const Home = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button variant={"outline"} className="text-black">
-                  Start Earning
-                </Button>
+                <Link href="/vault">
+                  <Button variant={"outline"} className="text-black">
+                    Start Earning
+                  </Button>
+                </Link>
               </CardFooter>
             </Card>
 
@@ -110,7 +112,9 @@ const Home = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button className="">Enter Marketplace</Button>
+                <Link href="/creations">
+                  <Button className="">Enter Marketplace</Button>
+                </Link>
               </CardFooter>
             </Card>
           </div>
@@ -120,12 +124,14 @@ const Home = () => {
           <h2 className="text-2xl font-bold mb-4">
             Creations from the Community
           </h2>
-          {creations &&
-            creations.map((creation: any) => (
-              <div className="col-span-6 lg:col-span-3" key={creation._id}>
-                <CreationCard creation={creation} account={account} />
-              </div>
-            ))}
+          <div className="grid grid-cols-10 gap-2 p-4">
+            {creations &&
+              creations.map((creation: any) => (
+                <div className="col-span-5 lg:col-span-2" key={creation._id}>
+                  <CreationCard creation={creation} account={account} />
+                </div>
+              ))}
+          </div>
         </div>
       </div>
     </>

@@ -24,13 +24,15 @@ export default function CreationCard({
       <Dialog>
         <DialogTrigger asChild>
           <Card>
-            <Image
-              src={creation.enhanced_image || creation.drawing_url}
-              width={180}
-              height={180}
-              alt={"game"}
-              className="aspect-[1] rounded-md m-1 lg:m-2"
-            />
+            <div className="w-full p-1 ">
+              <Image
+                src={creation.enhanced_image || creation.drawing_url}
+                width={200}
+                height={200}
+                alt={"game"}
+                className="aspect-[1] rounded-md border w-full"
+              />
+            </div>
 
             <div className="flex  m-2">
               <Avatar className="w-8 h-8">

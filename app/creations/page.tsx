@@ -57,7 +57,7 @@ export default function Games() {
   return (
     <div>
       <AppBar />
-      <div className="flex flex-col items-center justify-center w-full mt-20">
+      <div className="lg:container flex flex-col items-center justify-center w-full mt-20">
         <Tabs defaultValue="all-creations">
           <div className="flex flex-col items-center justify-center ">
             <TabsList className="grid  grid-cols-3  mb-2">
@@ -73,36 +73,36 @@ export default function Games() {
             </TabsList>
           </div>
           <TabsContent value="all-creations">
-            <div className="grid grid-cols-12 gap-2 p-4">
+            <div className="grid grid-cols-10 gap-2 p-4">
               {loadinigCreations && (
-                <div className="col-span-12 flex flex-col items-center justify-center mt-6">
+                <div className="col-span-10 flex flex-col items-center justify-center mt-6">
                   <LoaderCircle size={32} className="animate-spin" />
                 </div>
               )}
               {creations &&
                 creations.map((creation: any) => (
-                  <div className="col-span-6 lg:col-span-3" key={creation._id}>
+                  <div className="col-span-5 lg:col-span-2" key={creation._id}>
                     <CreationCard creation={creation} account={account} />
                   </div>
                 ))}
             </div>
           </TabsContent>
           <TabsContent value="for-sale">
-            <div className="grid grid-cols-12 gap-2 p-4">
+            <div className="grid grid-cols-10 gap-2 p-4">
               {loadinigCreations && (
-                <div className="col-span-12 flex flex-col items-center justify-center mt-6">
+                <div className="col-span-10 flex flex-col items-center justify-center mt-6">
                   <LoaderCircle size={32} className="animate-spin" />
                 </div>
               )}
               {listedCreations &&
                 listedCreations.map((creation: any) => (
-                  <div className="col-span-6 lg:col-span-3" key={creation._id}>
+                  <div className="col-span-5 lg:col-span-2" key={creation._id}>
                     <CreationCard creation={creation} account={account} />
                   </div>
                 ))}
 
               {listedCreations.length === 0 && (
-                <div className="col-span-12 text-center mt-6">
+                <div className="col-span-10 text-center mt-6">
                   <div className="text-2xl font-semibold text-gray-500">
                     No creations for sale...
                   </div>
@@ -111,30 +111,30 @@ export default function Games() {
             </div>
           </TabsContent>
           <TabsContent value="my-creations">
-            <div className="grid grid-cols-12 gap-2">
+            <div className="grid grid-cols-10 gap-2">
               {myCreations.length > 0 && (
-                <div className="col-span-12 text-center mt-6">
-                  <Link href="/create">
+                <div className="col-span-10 text-center mt-6">
+                  <Link href="/play">
                     <Button className="ml-2 mb-2 px-8">New Creation</Button>
                   </Link>
                 </div>
               )}
 
               {loadinigCreations && (
-                <div className="col-span-12 flex flex-col items-center justify-center mt-6">
+                <div className="col-span-10 flex flex-col items-center justify-center mt-6">
                   <LoaderCircle size={32} className="animate-spin" />
                 </div>
               )}
 
               {myCreations &&
                 myCreations.map((creation: any) => (
-                  <div className="col-span-6 lg:col-span-3" key={creation._id}>
+                  <div className="col-span-5 lg:col-span-2" key={creation._id}>
                     <CreationCard creation={creation} account={account} />
                   </div>
                 ))}
 
               {myCreations.length === 0 && account && (
-                <div className="col-span-12 text-center mt-6">
+                <div className="col-span-10 text-center mt-6">
                   <div className="text-2xl font-semibold text-gray-500">
                     No creations ...
                   </div>
