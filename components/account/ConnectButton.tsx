@@ -46,6 +46,7 @@ const ConnectButton = ({ action, setAccount, buttonVariant }: Props) => {
       setDisabled(true);
 
       if (minipay) {
+        console.log("Minipay", minipay);
         const data = await postConnect(minipay.address);
         const userdata = {
           ...data,
@@ -56,6 +57,7 @@ const ConnectButton = ({ action, setAccount, buttonVariant }: Props) => {
         setAccount(data);
       } else {
         if (!magic) throw new Error("Magic not connected");
+        console.log("Magic", magic);
         const accounts = await magic.wallet.connectWithUI();
 
         const userInfo = await magic.user.getInfo();
