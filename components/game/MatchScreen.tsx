@@ -32,7 +32,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
 }) => {
   const [generatedImage, setGeneratedImage] = useState("");
   const [loadingComaprison, setLoadingComparison] = useState(false);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState(10);
 
   const handleMintButtonClick = () => {
     onComplete(); // Trigger the transition to the MintScreen
@@ -51,7 +51,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   const calculateScore = () => {
     const timePenalty = timeTaken > 60 ? 0 : 60 - timeTaken;
     const similarityScore = similarity * 100;
-    const score = similarityScore - timePenalty;
+    const score = 20 + similarityScore - timePenalty;
     setScore(score);
   };
 
