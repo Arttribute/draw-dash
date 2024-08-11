@@ -162,15 +162,13 @@ export function MintDialog({
 
       const [address] = await walletClient.getAddresses();
 
-      const { request } = await publicClient.simulateContract({
+      await walletClient.writeContract({
         address: MintAddress,
         abi: DrawDashAbi,
         functionName: "mintNFT",
         args: [address, tokenUri],
-        account: privateKeyToAccount(address),
+        account: address,
       });
-
-      await walletClient.writeContract(request);
     } else if (web3) {
       const fromAddress = (await web3.eth.getAccounts())[0];
 
