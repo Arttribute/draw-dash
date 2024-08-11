@@ -119,7 +119,6 @@ const Home = () => {
             </Card>
           </div>
         </div>
-
         <div className="lg:mx-8">
           <h2 className="text-2xl font-bold mb-4">
             Creations from the Community
@@ -135,6 +134,7 @@ const Home = () => {
         </div>
       </div>
     </>
+
   );
 };
 

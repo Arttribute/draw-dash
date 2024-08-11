@@ -11,6 +11,8 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Label } from "@/components/ui/label";
+import { useMagicContext } from "../providers/MagicProvider";
+import { NFTMarketplaceAbi } from "@/lib/abi/NFTMarketplaceABI";
 
 export default function CreationCard({
   creation,
@@ -19,6 +21,41 @@ export default function CreationCard({
   creation: any;
   account: any;
 }) {
+  const { web3 } = useMagicContext();
+
+  const MarketplaceAddress = "0xa647c2a9032CAa06f721D79f0c05E1304cbfe0bC";
+  const MintAddress = "0x6288541D44Cd7E575711213798dEA5d94417519B";
+
+  async function buyNFT() {
+    if (!web3) throw new Error("Web3 not connected");
+    const fromAddress = (await web3.eth.getAccounts())[0];
+
+    const contract = new web3.eth.Contract(
+      NFTMarketplaceAbi,
+      MarketplaceAddress
+    );
+
+    const receipt = await contract.methods.buyNFT(MintAddress, 1).send({
+      from: fromAddress,
+    });
+    console.log("receipt", receipt);
+  }
+
+  async function listNFT() {
+    if (!web3) throw new Error("Web3 not connected");
+    const fromAddress = (await web3.eth.getAccounts())[0];
+
+    const contract = new web3.eth.Contract(
+      NFTMarketplaceAbi,
+      MarketplaceAddress
+    );
+
+    const receipt = await contract.methods.listNFT(MintAddress, 1, 1).send({
+      from: fromAddress,
+    });
+    console.log("receipt", receipt);
+  }
+
   return (
     <>
       <Dialog>
@@ -114,12 +151,20 @@ export default function CreationCard({
                 </p>
               </div>
               {creation.listed && creation.owner?._id !== account?._id && (
-                <Button className="w-full mt-2 px-6 py-3 mx-2 ">Buy NFT</Button>
+                <Button
+                  className="w-full mt-2 px-6 py-3 mx-2 "
+                  onClick={buyNFT}
+                >
+                  Buy NFT
+                </Button>
               )}
               {!creation.listed &&
                 creation.minted &&
                 creation.owner?._id === account?._id && (
-                  <Button className="w-full mt-2 px-6 py-3 mx-2 ">
+                  <Button
+                    className="w-full mt-2 px-6 py-3 mx-2 "
+                    onClick={listNFT}
+                  >
                     List NFT
                   </Button>
                 )}

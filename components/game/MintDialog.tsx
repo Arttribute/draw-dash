@@ -16,6 +16,12 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { set } from "mongoose";
+import { createWalletClient, custom, getContract } from "viem";
+import { mainnet, holesky } from "viem/chains";
+import { ethers } from "ethers";
+import { DrawDashAbi } from "@/lib/abi/DrawDashNFTABI";
+import { useMinipay } from "../providers/MinipayProvider";
+import { useMagicContext } from "../providers/MagicProvider";
 
 export function MintDialog({
   drawingUrl,
@@ -30,7 +36,12 @@ export function MintDialog({
   const [enhancedImage, setEnhancedImage] = useState("");
   const [enhancementStarted, setEnhancementStarted] = useState(false);
   const [loadingEnhancedImage, setLoadingEnhancedImage] = useState(false);
+  const [minting, setMinting] = useState(false);
+  const [isMinted, setIsMinted] = useState(false);
   const [creationName, setCreationName] = useState("");
+
+  const { minipay } = useMinipay();
+  const { web3 } = useMagicContext();
 
   async function generateArt() {
     setPromptId("");
@@ -91,6 +102,9 @@ export function MintDialog({
         setEnhancedImage(result.data.data.images[0]);
         updateCreation(result.data.data.images[0]);
         setLoadingEnhancedImage(false);
+        setMinting(true);
+        await mintArt();
+        setMinting(false);
       } else {
         getEnhancedImage();
       }
@@ -103,6 +117,7 @@ export function MintDialog({
     const detailsToUpdate = {
       name: creationName,
       enhanced_image: enhancedImage_url,
+      minted: true,
     };
     console.log("creationDataOnmint", creationData);
     console.log("detailsToUpdate", detailsToUpdate);
@@ -114,6 +129,46 @@ export function MintDialog({
       { params: { id: creationData?._id } }
     );
     console.log("res", res);
+  }
+
+  async function mintArt() {
+    const MintAddress = "0x6288541D44Cd7E575711213798dEA5d94417519B";
+    const tokenUri = "https://mosaicsnft.com/api/metadata/1";
+
+    if (minipay) {
+      // TODO: Fix this... quite buggy
+      const walletClient = createWalletClient({
+        chain: mainnet,
+        transport: custom((window as any).ethereum!),
+      });
+
+      const contract = getContract({
+        address: MintAddress,
+        abi: DrawDashAbi,
+        client: {
+          wallet: walletClient,
+        },
+      });
+
+      const [address] = await walletClient.getAddresses();
+
+      const hash = await contract.write.mintNFT([address, tokenUri]);
+      console.log("hash", hash);
+    } else if (web3) {
+      const fromAddress = (await web3.eth.getAccounts())[0];
+
+      const contract = new web3.eth.Contract(DrawDashAbi, MintAddress);
+
+      const receipt = await contract.methods
+        .mintNFT(fromAddress, tokenUri)
+        .send({
+          from: fromAddress,
+        });
+      console.log("receipt", receipt);
+      setIsMinted(true);
+    } else {
+      throw new Error("No wallet provider found");
+    }
   }
 
   return (
@@ -160,16 +215,19 @@ export function MintDialog({
         />
 
         <DialogFooter>
-          {!loadingEnhancedImage && (
-            <Button type="submit" className="w-full" onClick={generateArt}>
-              Enhance and mint
-            </Button>
-          )}
-          {loadingEnhancedImage && (
-            <Button type="submit" className="w-full" disabled>
-              Enhancing...
-            </Button>
-          )}
+          <Button
+            className="w-full"
+            disabled={minting || isMinted || loadingEnhancedImage}
+            onClick={generateArt}
+          >
+            {isMinted
+              ? "Already Minted"
+              : minting
+              ? "Minting..."
+              : loadingEnhancedImage
+              ? "Enhancing..."
+              : "Enhance and mint"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

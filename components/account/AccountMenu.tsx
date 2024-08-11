@@ -16,9 +16,12 @@ import { useEffect, useState } from "react";
 import ConnectButton from "./ConnectButton";
 import { User } from "@/models/User";
 import { Coins } from "lucide-react";
+import { useMinipay } from "../providers/MinipayProvider";
+import MinipayButton from "./MinipayButton";
 
 export default function AccountMenu() {
   const [account, setAccount] = useState<User | null>(null);
+  const { minipay } = useMinipay();
 
   useEffect(() => {
     const userJson = localStorage.getItem("user");
@@ -79,9 +82,20 @@ export default function AccountMenu() {
                   </Link>
                 </MenubarItem>
                 <MenubarSeparator />
-                <div className="w-full">
-                  <ConnectButton action="Disconnect" setAccount={setAccount} />
-                </div>
+                <MenubarItem inset>
+                  {minipay ? (
+                    <div className="w-full">
+                      <MinipayButton balance={minipay.balance} />
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <ConnectButton
+                        action="Disconnect"
+                        setAccount={setAccount}
+                      />
+                    </div>
+                  )}
+                </MenubarItem>
               </MenubarContent>
             </MenubarMenu>
           </>
