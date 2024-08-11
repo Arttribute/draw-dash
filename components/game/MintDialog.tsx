@@ -14,12 +14,19 @@ import Image from "next/image";
 import axios from "axios";
 
 import { useState, useEffect } from "react";
-import { createWalletClient, custom, getContract } from "viem";
+import {
+  createPublicClient,
+  createWalletClient,
+  custom,
+  getContract,
+  http,
+} from "viem";
 import { mainnet, holesky } from "viem/chains";
 import { ethers } from "ethers";
 import { DrawDashAbi } from "@/lib/abi/DrawDashNFTABI";
 import { useMinipay } from "../providers/MinipayProvider";
 import { useMagicContext } from "../providers/MagicProvider";
+import { privateKeyToAccount } from "viem/accounts";
 
 export function MintDialog({
   drawingUrl,
@@ -143,23 +150,27 @@ export function MintDialog({
 
     if (minipay) {
       // TODO: Fix this... quite buggy
+      const publicClient = createPublicClient({
+        chain: mainnet,
+        transport: http(),
+      });
+
       const walletClient = createWalletClient({
         chain: mainnet,
         transport: custom((window as any).ethereum!),
       });
 
-      const contract = getContract({
-        address: MintAddress,
-        abi: DrawDashAbi,
-        client: {
-          wallet: walletClient,
-        },
-      });
-
       const [address] = await walletClient.getAddresses();
 
-      const hash = await contract.write.mintNFT([address, tokenUri]);
-      console.log("hash", hash);
+      const { request } = await publicClient.simulateContract({
+        address: "0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2",
+        abi: DrawDashAbi,
+        functionName: "mintNFT",
+        args: [address, tokenUri],
+        account: privateKeyToAccount(address),
+      });
+
+      await walletClient.writeContract(request);
     } else if (web3) {
       const fromAddress = (await web3.eth.getAccounts())[0];
 
