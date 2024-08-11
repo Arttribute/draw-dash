@@ -97,7 +97,7 @@ const Home = () => {
                     Play to Earn
                   </Button>
                 </Link>
-                <Link href="/play">
+                <Link href="/vault">
                   <Button className=" ml-1">Deposit to vault</Button>
                 </Link>
               </CardFooter>

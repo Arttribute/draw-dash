@@ -88,7 +88,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   return (
     <div className="flex flex-col items-center p-6 mt-10 min-h-screen">
       <div className="">
-        <div className="absolute inset-0 opacity-30 rounded-lg bg-slate-200"></div>
+        <div className="absolute inset-0 opacity-30 rounded-lg"></div>
         <div className="relative z-10">
           <div className="text-center mb-4">
             <p className="text-xl font-semibold text-gray-800">
