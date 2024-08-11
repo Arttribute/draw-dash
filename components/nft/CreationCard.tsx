@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useMagicContext } from "../providers/MagicProvider";
 import { NFTMarketplaceAbi } from "@/lib/abi/NFTMarketplaceABI";
+import { useMinipay } from "../providers/MinipayProvider";
+import { createDangoClient } from "@/lib/minipay";
 
 export default function CreationCard({
   creation,
@@ -21,39 +23,70 @@ export default function CreationCard({
   creation: any;
   account: any;
 }) {
+  const { minipay } = useMinipay();
   const { web3 } = useMagicContext();
 
   const MarketplaceAddress = "0xa647c2a9032CAa06f721D79f0c05E1304cbfe0bC";
   const MintAddress = "0x6288541D44Cd7E575711213798dEA5d94417519B";
 
   async function buyNFT() {
-    if (!web3) throw new Error("Web3 not connected");
-    const fromAddress = (await web3.eth.getAccounts())[0];
+    if (minipay) {
+      const walletClient = createDangoClient();
 
-    const contract = new web3.eth.Contract(
-      NFTMarketplaceAbi,
-      MarketplaceAddress
-    );
+      const [address] = await walletClient.getAddresses();
 
-    const receipt = await contract.methods.buyNFT(MintAddress, 1).send({
-      from: fromAddress,
-    });
-    console.log("receipt", receipt);
+      await walletClient.writeContract({
+        address: MarketplaceAddress,
+        abi: NFTMarketplaceAbi,
+        functionName: "buyNFT",
+        args: [MintAddress, 1],
+        account: address,
+      });
+    } else if (web3) {
+      const fromAddress = (await web3.eth.getAccounts())[0];
+
+      const contract = new web3.eth.Contract(
+        NFTMarketplaceAbi,
+        MarketplaceAddress
+      );
+
+      const receipt = await contract.methods.buyNFT(MintAddress, 1).send({
+        from: fromAddress,
+      });
+      console.log("receipt", receipt);
+    } else {
+      throw new Error("No wallet provider found");
+    }
   }
 
   async function listNFT() {
-    if (!web3) throw new Error("Web3 not connected");
-    const fromAddress = (await web3.eth.getAccounts())[0];
+    if (minipay) {
+      const walletClient = createDangoClient();
 
-    const contract = new web3.eth.Contract(
-      NFTMarketplaceAbi,
-      MarketplaceAddress
-    );
+      const [address] = await walletClient.getAddresses();
 
-    const receipt = await contract.methods.listNFT(MintAddress, 1, 1).send({
-      from: fromAddress,
-    });
-    console.log("receipt", receipt);
+      await walletClient.writeContract({
+        address: MarketplaceAddress,
+        abi: NFTMarketplaceAbi,
+        functionName: "listNFT",
+        args: [MintAddress, 1, 1],
+        account: address,
+      });
+    } else if (web3) {
+      const fromAddress = (await web3.eth.getAccounts())[0];
+
+      const contract = new web3.eth.Contract(
+        NFTMarketplaceAbi,
+        MarketplaceAddress
+      );
+
+      const receipt = await contract.methods.listNFT(MintAddress, 1, 1).send({
+        from: fromAddress,
+      });
+      console.log("receipt", receipt);
+    } else {
+      throw new Error("No wallet provider found");
+    }
   }
 
   return (

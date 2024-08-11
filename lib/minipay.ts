@@ -10,6 +10,7 @@ import {
 } from "viem";
 import { celo, celoAlfajores, mainnet } from "viem/chains";
 import { stableTokenABI } from "@celo/abis";
+import { dango } from "./dango";
 
 export type Token = "cUSD" | "USDC" | "USDT";
 
@@ -50,6 +51,15 @@ const getStableTokenAddress = (token: Token, isTestnet: boolean) => {
 export const createMinipayClient = () => {
   const client = createWalletClient({
     chain: mainnet,
+    transport: custom((window as any).ethereum!),
+  });
+
+  return client;
+};
+
+export const createDangoClient = () => {
+  const client = createWalletClient({
+    chain: dango,
     transport: custom((window as any).ethereum!),
   });
 

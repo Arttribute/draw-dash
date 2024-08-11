@@ -14,11 +14,10 @@ import Image from "next/image";
 import axios from "axios";
 
 import { useState, useEffect } from "react";
-import { createWalletClient, custom } from "viem";
 import { DrawDashAbi } from "@/lib/abi/DrawDashNFTABI";
 import { useMinipay } from "../providers/MinipayProvider";
 import { useMagicContext } from "../providers/MagicProvider";
-import { dango } from "@/lib/dango";
+import { createDangoClient } from "@/lib/minipay";
 
 export function MintDialog({
   drawingUrl,
@@ -141,10 +140,7 @@ export function MintDialog({
     const tokenUri = "https://mosaicsnft.com/api/metadata/1";
 
     if (minipay) {
-      const walletClient = createWalletClient({
-        chain: dango,
-        transport: custom((window as any).ethereum!),
-      });
+      const walletClient = createDangoClient();
 
       const [address] = await walletClient.getAddresses();
 
