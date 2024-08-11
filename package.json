@@ -32,7 +32,7 @@
     "clsx": "^2.1.1",
     "draw-dash": "file:",
     "lucide-react": "^0.423.0",
-    "magic-sdk": "^28.0.3",
+    "magic-sdk": "^28.2.0",
     "mongoose": "^8.5.2",
     "next": "14.2.5",
     "openai": "^4.55.4",
