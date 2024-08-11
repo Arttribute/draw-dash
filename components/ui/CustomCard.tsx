@@ -15,19 +15,15 @@ type CustomCardProps = {
   title: string;
   description: string;
   buttonLabel: string;
-  className?: string;
-  buttonVariant?: string;
 };
 
 const CustomCard: React.FC<CustomCardProps> = ({
   title,
   description,
   buttonLabel,
-  className,
-  buttonVariant,
 }) => {
   return (
-    <Card className={className}>
+    <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
@@ -35,12 +31,7 @@ const CustomCard: React.FC<CustomCardProps> = ({
         <p className="hidden sm:block ">{description}</p>
       </CardContent>
       <CardFooter>
-        <Button
-          variant={buttonVariant}
-          className={buttonVariant === "outline" ? "text-black" : "px-8"}
-        >
-          {buttonLabel}
-        </Button>
+        <Button>{buttonLabel}</Button>
       </CardFooter>
     </Card>
   );
