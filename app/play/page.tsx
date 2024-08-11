@@ -18,6 +18,7 @@ const Play = () => {
   const [imagePrompt, setImagePrompt] = useState("");
   const [isPlayToEarn, setIsPlayToEarn] = useState(false);
   const [multiplier, setMultiplier] = useState(0);
+  const [timeTaken, setTimeTaken] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
   const [creationData, setCreationData] = useState<any>({});
 
@@ -107,6 +108,7 @@ const Play = () => {
                 depositAmount={depositAmount}
                 account={account}
                 setCreationData={setCreationData}
+                setTimeTaken={setTimeTaken}
               />
             )}
             {currentScreen === "match" && (
@@ -119,6 +121,7 @@ const Play = () => {
                 similarity={similarity}
                 setSimilarity={setSimilarity}
                 creationData={creationData}
+                timeTaken={timeTaken}
               />
             )}
           </>

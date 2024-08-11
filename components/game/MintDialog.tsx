@@ -25,10 +25,14 @@ export function MintDialog({
   drawingUrl,
   prompt,
   creationData,
+  score,
+  similarity,
 }: {
   drawingUrl: string;
   prompt: string;
   creationData: any;
+  score: number;
+  similarity: number;
 }) {
   const [promptId, setPromptId] = useState("");
   const [enhancedImage, setEnhancedImage] = useState("");
@@ -118,6 +122,8 @@ export function MintDialog({
       name: creationName,
       enhanced_image: enhancedImage_url,
       minted: true,
+      score: score,
+      similarity: similarity,
     };
     console.log("creationDataOnmint", creationData);
     console.log("detailsToUpdate", detailsToUpdate);

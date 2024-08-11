@@ -6,6 +6,7 @@ import DrawingCanvas from "../ui/drawingcanvas";
 import GameTimer from "./GameTimer";
 import axios from "axios";
 import MultiplierDisplay from "./MultiplierDisplay";
+import { set } from "mongoose";
 
 interface GameScreenProps {
   onComplete: () => void;
@@ -16,6 +17,7 @@ interface GameScreenProps {
   depositAmount: any;
   account: any;
   setCreationData: any;
+  setTimeTaken: any;
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({
@@ -27,6 +29,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   depositAmount,
   account,
   setCreationData,
+  setTimeTaken,
 }) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -46,6 +49,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
     if (canvasRef.current) {
       const originalCanvas = canvasRef.current;
       const originalContext = originalCanvas.getContext("2d");
+      setTimeTaken(60 - secondsLeft);
 
       if (originalContext) {
         // Create a new canvas with the same dimensions
