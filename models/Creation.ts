@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import User from "./User";
+const { ObjectId } = mongoose.Schema.Types;
 
 export interface Creation extends mongoose.Document {
   drawing_url: string;
@@ -34,8 +35,8 @@ const creationSchema = new mongoose.Schema(
       required: true,
     },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: ObjectId,
+      ref: User,
     },
     minted: {
       type: Boolean,

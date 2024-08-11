@@ -9,13 +9,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
 
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
-import { set } from "mongoose";
 import { createWalletClient, custom, getContract } from "viem";
 import { mainnet, holesky } from "viem/chains";
 import { ethers } from "ethers";
@@ -39,6 +37,8 @@ export function MintDialog({
   const [minting, setMinting] = useState(false);
   const [isMinted, setIsMinted] = useState(false);
   const [creationName, setCreationName] = useState("");
+
+  const router = useRouter();
 
   const { minipay } = useMinipay();
   const { web3 } = useMagicContext();
@@ -169,6 +169,7 @@ export function MintDialog({
     } else {
       throw new Error("No wallet provider found");
     }
+    router.push("/creations");
   }
 
   return (

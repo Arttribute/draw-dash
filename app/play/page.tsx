@@ -26,7 +26,7 @@ const Play = () => {
   };
 
   const handleMatchScreenComplete = () => {
-    setCurrentScreen("mint");
+    setCurrentScreen("game");
   };
 
   const handleStartGame = () => {

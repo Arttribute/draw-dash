@@ -86,16 +86,19 @@ const Home = () => {
               </CardHeader>
               <CardContent>
                 <p className="hidden sm:block ">
-                  Show off your drawing skills by competing against others. Earn
-                  points and rewards based on how close your sketch is to the
-                  generated image
+                  Show off your drawing skills by competing against others.
+                  Deposit, play and earn cash rewards based on how close your
+                  sketch is to the generated image.
                 </p>
               </CardContent>
               <CardFooter>
-                <Link href="/vault">
-                  <Button variant={"outline"} className="text-black">
-                    Start Earning
+                <Link href="/play">
+                  <Button variant={"outline"} className="text-black px-8">
+                    Play to Earn
                   </Button>
+                </Link>
+                <Link href="/vault">
+                  <Button className=" ml-1">Deposit to vault</Button>
                 </Link>
               </CardFooter>
             </Card>
@@ -134,7 +137,6 @@ const Home = () => {
         </div>
       </div>
     </>
-
   );
 };
 
