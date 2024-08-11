@@ -37,10 +37,11 @@ export function MintDialog({
   const [enhancementStarted, setEnhancementStarted] = useState(false);
   const [loadingEnhancedImage, setLoadingEnhancedImage] = useState(false);
   const [minting, setMinting] = useState(false);
+  const [isMinted, setIsMinted] = useState(false);
   const [creationName, setCreationName] = useState("");
 
   const { minipay } = useMinipay();
-  const { magic } = useMagicContext();
+  const { web3 } = useMagicContext();
 
   async function generateArt() {
     setPromptId("");
@@ -152,15 +153,18 @@ export function MintDialog({
 
       const hash = await contract.write.mintNFT([address, tokenUri]);
       console.log("hash", hash);
-    } else if (magic) {
-      const provider = new ethers.BrowserProvider(magic.rpcProvider);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
+    } else if (web3) {
+      const fromAddress = (await web3.eth.getAccounts())[0];
 
-      const contract = new ethers.Contract(MintAddress, DrawDashAbi, signer);
+      const contract = new web3.eth.Contract(DrawDashAbi, MintAddress);
 
-      const hash = await contract.mintNFT(address, tokenUri);
-      console.log("hash", hash);
+      const receipt = await contract.methods
+        .mintNFT(fromAddress, tokenUri)
+        .send({
+          from: fromAddress,
+        });
+      console.log("receipt", receipt);
+      setIsMinted(true);
     } else {
       throw new Error("No wallet provider found");
     }
@@ -212,10 +216,12 @@ export function MintDialog({
         <DialogFooter>
           <Button
             className="w-full"
-            disabled={minting || loadingEnhancedImage}
+            disabled={minting || isMinted || loadingEnhancedImage}
             onClick={generateArt}
           >
-            {minting
+            {isMinted
+              ? "Already Minted"
+              : minting
               ? "Minting..."
               : loadingEnhancedImage
               ? "Enhancing..."
