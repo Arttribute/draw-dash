@@ -6,9 +6,9 @@
 
 DrawDash offers a unique blend of creativity and competitive gameplay, allowing players to create and enhance art while having fun. After completing their sketches, players can enhance their drawings using AI ControlNet technology, mint their creations as NFTs, and list them for sale on the integrated marketplace.
 
-For those seeking a competitive edge, the Play-to-Earn mode allows players to deposit funds and earn multipliers based on their performance. Achieving a similarity score above 60% grants them multiplied rewards, while failing to meet the threshold results in a partial loss of their deposit. The game is supported by a vault where users can lock up their funds to pay out winning players, with profits distributed to vault participants.
+For those seeking a competitive edge, the Play-to-Earn mode allows players to deposit funds and earn multipliers based on their performance. Achieving a similarity score above 60% grants them multiplied rewards while failing to meet the threshold results in a partial loss of their deposit. The game is supported by a vault where users can lock up their funds to pay out winning players, with profits distributed to vault participants.
 
-Behind the scenes, DrawDash leverages advanced technologies like Astria’s Stability Diffusion API for AI-generated images and ChatGPT for generating text prompts. The backend utilizes MongoDB for storing game details off-chain, with Solidity smart contracts deployed on BaseSepolia, Alfajores, and Dango networks via Hardhat. The game also integrates Magic SDK for user onboarding, allowing login via email or web3 wallet, and offers World ID as a sign-in option.
+Behind the scenes, DrawDash leverages advanced technologies like Astria’s Stability Diffusion API for AI-generated images and ChatGPT for generating text prompts. The backend utilizes MongoDB to store game details off-chain, with Solidity smart contracts deployed on BaseSepolia, Alfajores, and Dango networks via Hardhat. Draw Dash is integrated with Minipay stablecoin wallet enabling users on Opera Mini to sign easily. The game also integrates Magic SDK for user onboarding, allowing login via email or web3 wallet, and offers World ID as a sign-in option.
 
 ## How It's Made
 
