@@ -16,7 +16,7 @@ DrawDash is built using a combination of cutting-edge technologies to deliver an
 
 - **AI Image Generation**: Astria's Stability Diffusion API generates high-quality images based on text prompts produced by ChatGPT.
 - **Blockchain Integration**: Solidity smart contracts manage NFT minting, marketplace transactions, and the Play-to-Earn mechanics. These contracts are deployed on multiple blockchain networks, including BaseSepolia and Alfajores.
-- **User Onboarding**: Magic SDK is used for user authentication, allowing players to sign in using an email address or a web3 wallet. World ID integration provides an additional secure sign-in option.
+- **User Onboarding**: Magic SDK is used for user authentication, allowing players to sign in using an email address or a web3 wallet. Draw Dash is also integrated with Minipay stablecoin wallet allowing users on Opera Mini to easily sign. World ID integration provides an additional secure sign-in option.
 - **Backend Infrastructure**: MongoDB is employed to store game data off-chain, ensuring a smooth and responsive gameplay experience.
 
 ## Game Mechanics
