@@ -11,7 +11,6 @@ module.exports = {
     hardhat: {
       chainId: 1337,
     },
-
     basemainnet: {
       url: "https://mainnet.base.org",
       accounts: [privateKey],

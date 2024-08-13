@@ -44,6 +44,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
     generatePrompt();
   }, []);
 
+  useEffect(() => {
+    if (secondsLeft === 0) {
+      handleSubmit();
+    }
+  }, [secondsLeft]);
+
   const handleSubmit = () => {
     setScore(Math.floor(Math.random() * 100));
     if (canvasRef.current) {
