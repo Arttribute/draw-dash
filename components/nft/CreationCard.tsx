@@ -26,10 +26,14 @@ export default function CreationCard({
   const { minipay } = useMinipay();
   const { web3 } = useMagicContext();
 
+  const [isListing, setIsListing] = React.useState(false);
+  const [isBuying, setIsBuying] = React.useState(false);
+
   const MarketplaceAddress = "0xa647c2a9032CAa06f721D79f0c05E1304cbfe0bC";
   const MintAddress = "0x6288541D44Cd7E575711213798dEA5d94417519B";
 
   async function buyNFT() {
+    setIsBuying(true);
     if (minipay) {
       const walletClient = createDangoClient();
 
@@ -57,9 +61,11 @@ export default function CreationCard({
     } else {
       throw new Error("No wallet provider found");
     }
+    setIsBuying(false);
   }
 
   async function listNFT() {
+    setIsListing(true);
     if (minipay) {
       const walletClient = createDangoClient();
 
@@ -87,6 +93,7 @@ export default function CreationCard({
     } else {
       throw new Error("No wallet provider found");
     }
+    setIsListing(false);
   }
 
   return (
@@ -187,8 +194,9 @@ export default function CreationCard({
                 <Button
                   className="w-full mt-2 px-6 py-3 mx-2 "
                   onClick={buyNFT}
+                  disabled={isBuying}
                 >
-                  Buy NFT
+                  {isBuying ? "Buying NFT..." : "Buy NFT"}
                 </Button>
               )}
               {!creation.listed &&
@@ -197,8 +205,9 @@ export default function CreationCard({
                   <Button
                     className="w-full mt-2 px-6 py-3 mx-2 "
                     onClick={listNFT}
+                    disabled={isListing}
                   >
-                    List NFT
+                    {isListing ? "Listing NFT..." : "List NFT"}
                   </Button>
                 )}
               {!creation.minted && creation.owner?._id === account?._id && (
