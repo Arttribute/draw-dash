@@ -5,7 +5,7 @@ import {
   type Processor,
   RawImage,
 } from "@xenova/transformers";
-import { cosineSimilarity } from "./util";
+import { cosineSimilarity } from "./_util";
 
 export async function POST(request: Request) {
   try {
