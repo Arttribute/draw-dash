@@ -86,19 +86,25 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   async function compareImages(queryImageURL: string, ansImageURL: string) {
     setLoadingComparison(true);
     setSimilarity(0);
-    // Create form data
-    const formData = new FormData();
-    formData.append("query_image", queryImageURL);
-    formData.append("ans_image", ansImageURL);
 
-    const res = await fetch("/api/compare", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    console.log("Comparison Data", data);
-    setSimilarity(data.similarity);
-    setLoadingComparison(false);
+    try {
+      // Create form data
+      const formData = new FormData();
+      formData.append("query_image", queryImageURL);
+      formData.append("ans_image", ansImageURL);
+
+      const res = await fetch("/api/compare", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      console.log("Comparison Data", data);
+      setSimilarity(data.similarity);
+    } catch (error) {
+      console.error("Error in API call:", error);
+    } finally {
+      setLoadingComparison(false);
+    }
   }
 
   return (
