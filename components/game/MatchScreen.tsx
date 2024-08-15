@@ -88,10 +88,20 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
     setSimilarity(0);
 
     try {
+      // upload image to cloudinary to avoid cors error
+      const queryImagedata = new FormData();
+      queryImagedata.append("file", ansImageURL);
+      queryImagedata.append("upload_preset", "studio-upload");
+      const resImage = await axios.post(
+        "https://api.cloudinary.com/v1_1/arttribute/upload",
+        queryImagedata
+      );
+      console.log("AI image uploaded to cloudinary");
+
       // Create form data
       const formData = new FormData();
       formData.append("query_image", queryImageURL);
-      formData.append("ans_image", ansImageURL);
+      formData.append("ans_image", resImage.data.secure_url);
 
       const res = await fetch("/api/compare", {
         method: "POST",

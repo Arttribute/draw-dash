@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     // Read the two images as raw images
     const rawImageQuery = await RawImage.fromURL(query_image);
-    const rawImageAns = await RawImage.fromURL(query_image);
+    const rawImageAns = await RawImage.fromURL(ans_image);
 
     // Tokenize the two images
     const tokenizedImageQuery = await processor(rawImageQuery);
