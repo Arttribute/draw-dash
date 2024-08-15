@@ -5,6 +5,7 @@ import ImageComparison from "../ui/imagecomparison";
 import { MintDialog } from "./MintDialog";
 
 import axios from "axios";
+import LoadingCount from "./LoadingCount";
 
 interface MatchScreenProps {
   onComplete: () => void;
@@ -30,7 +31,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   timeTaken,
 }) => {
   const [generatedImage, setGeneratedImage] = useState("");
-  const [loadingComaprison, setLoadingComparison] = useState(false);
+  const [loadingComparison, setLoadingComparison] = useState(false);
   const [score, setScore] = useState(10);
 
   const handleMintButtonClick = () => {
@@ -107,13 +108,16 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
         <div className="relative z-10">
           <div className="text-center mb-4">
             <p className="text-xl font-semibold text-gray-800">
-              Score: <span className="text-green-600">{score?.toFixed(2)}</span>
+              Score:{" "}
+              <span className="text-green-600">
+                {loadingComparison ? <LoadingCount /> : score?.toFixed(2)}
+              </span>
             </p>
           </div>
           <div className="flex items-center justify-center">
             <div className="text-center mb-4 mr-4">
               <span className="text-sm text-green-600">
-                {similarity?.toFixed(2)}
+                {loadingComparison ? <LoadingCount /> : similarity?.toFixed(2)}
               </span>
               <p className="text-xs font-semibold text-gray-800">similarity</p>
             </div>
