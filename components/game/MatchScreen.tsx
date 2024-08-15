@@ -6,6 +6,7 @@ import { MintDialog } from "./MintDialog";
 
 import axios from "axios";
 import LoadingCount from "./LoadingCount";
+import { compare } from "@/app/actions/compare";
 
 interface MatchScreenProps {
   onComplete: () => void;
@@ -98,18 +99,11 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
       );
       console.log("AI image uploaded to cloudinary");
 
-      // Create form data
-      const formData = new FormData();
-      formData.append("query_image", queryImageURL);
-      formData.append("ans_image", resImage.data.secure_url);
-
-      const res = await fetch("/api/compare", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      console.log("Comparison Data", data);
-      setSimilarity(data.similarity);
+      const imageSimilarity = await compare(
+        queryImageURL,
+        resImage.data.secure_url
+      );
+      setSimilarity(imageSimilarity);
     } catch (error) {
       console.error("Error in API call:", error);
     } finally {
