@@ -91,9 +91,11 @@ export default function CreationCard({
       );
 
       console.log("Listing address:", fromAddress, "Listing price:", price);
-      const receipt = await contract.methods.listNFT(MintAddress, 1, 1).send({
-        from: fromAddress,
-      });
+      const receipt = await contract.methods
+        .listNFT(MintAddress, 1, price)
+        .send({
+          from: fromAddress,
+        });
 
       const detailsToUpdate = {
         listed: true,
