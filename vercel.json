@@ -1,7 +1,6 @@
 {
   "functions": {
     "app/api/compare/route.ts": {
-      "memory": 1024,
       "maxDuration": 30
     }
   }
