@@ -13,6 +13,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { createWalletClient, custom, getContract } from "viem";
+import { mainnet } from "viem/chains";
+import { DrawDashPlayToEarnAbi } from "@/lib/abi/DrawDashPlayToEarn";
+import { useMinipay } from "../providers/MinipayProvider";
+import { useMagicContext } from "../providers/MagicProvider";
 
 import { Input } from "@/components/ui/input";
 
@@ -33,10 +38,62 @@ const StartGameScreen: React.FC<StartGameScreenProps> = ({
     onComplete();
   };
 
-  const depositAndPlay = () => {
+  async function depositAndPlay() {
     setIsPlayToEarn(true);
+    await playGame(depositAmount, false);
     onComplete();
-  };
+  }
+
+  const { minipay } = useMinipay();
+  const { web3 } = useMagicContext();
+
+  async function playGame(stake: any, win: any) {
+    const contractAddress = "0xd14735436518c564795877Ec521B35B772566eAe"; // Replace with your contract's address
+
+    if (minipay) {
+      const walletClient = createWalletClient({
+        chain: mainnet,
+        transport: custom((window as any).ethereum!),
+      });
+
+      const contract = getContract({
+        address: contractAddress,
+        abi: DrawDashPlayToEarnAbi,
+        client: {
+          wallet: walletClient,
+        },
+      });
+
+      const [address] = await walletClient.getAddresses();
+
+      try {
+        const hash = await contract.write.playGame([stake, win], {
+          from: address,
+        });
+        console.log("Transaction hash", hash);
+      } catch (error) {
+        console.error("Error playing game:", error);
+      }
+    } else if (web3) {
+      const fromAddress = (await web3.eth.getAccounts())[0];
+
+      const contract = new web3.eth.Contract(
+        DrawDashPlayToEarnAbi,
+        contractAddress
+      );
+
+      try {
+        const receipt = await contract.methods.playGame(stake, win).send({
+          from: fromAddress,
+        });
+        console.log("Transaction receipt", receipt);
+      } catch (error) {
+        console.error("Error playing game:", error);
+      }
+    } else {
+      throw new Error("No wallet provider found");
+    }
+  }
 
   return (
     <>
@@ -60,8 +117,8 @@ const StartGameScreen: React.FC<StartGameScreenProps> = ({
                 </h4>
                 <div className=" p-2">
                   <p className="text-sm mb-4 ml-2 ">
-                    Play AI art puzzles just for fun. Compete on the global
-                    leaderboard and earn an NFT for puzzles you solve.
+                    Draw to solve AI art puzzles just for fun. Compete on the
+                    global leaderboard and earn NFTs.
                   </p>
                 </div>
               </div>
@@ -85,12 +142,12 @@ const StartGameScreen: React.FC<StartGameScreenProps> = ({
             <CardContent>
               <div className="m-2">
                 <h4 className="text-lg font-semibold mb-4">
-                  Stake, play and earn rewards
+                  Deposit, Sketch and Earn
                 </h4>
                 <div className="p-2">
                   <p className="text-sm mb-4 ml-2">
-                    Stake your FIL and play the AI art puzzle game to earn
-                    rewards and NFTs. The more you play, the more you earn.
+                    Deposit an amount and play the AI art puzzle game to earn
+                    rewards based on your performance.
                   </p>
                 </div>
               </div>

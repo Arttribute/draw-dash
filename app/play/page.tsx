@@ -7,6 +7,8 @@ import AppBar from "@/components/layout/AppBar";
 import StartGameScreen from "@/components/game/StartGameScreen";
 import { User } from "@/models/User";
 
+import RequireAuthPlaceholder from "@/components/account/RequireAuthPlaceHolder";
+
 const Play = () => {
   const [currentScreen, setCurrentScreen] = useState("start"); // Default to 'game'
   const [promptId, setPromptId] = useState("");
@@ -16,6 +18,7 @@ const Play = () => {
   const [imagePrompt, setImagePrompt] = useState("");
   const [isPlayToEarn, setIsPlayToEarn] = useState(false);
   const [multiplier, setMultiplier] = useState(0);
+  const [timeTaken, setTimeTaken] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
   const [creationData, setCreationData] = useState<any>({});
 
@@ -24,7 +27,7 @@ const Play = () => {
   };
 
   const handleMatchScreenComplete = () => {
-    setCurrentScreen("mint");
+    setCurrentScreen("game");
   };
 
   const handleStartGame = () => {
@@ -79,37 +82,49 @@ const Play = () => {
       <AppBar />
 
       <div className="flex flex-col items-center justify-center mt-8 ">
-        {currentScreen === "start" && (
-          <StartGameScreen
-            onComplete={handleStartGame}
-            setIsPlayToEarn={setIsPlayToEarn}
-            setDepositAmount={setDepositAmount}
-            depositAmount={depositAmount}
-          />
+        {!account && loadedAccount && (
+          <div className="mt-12">
+            <RequireAuthPlaceholder />
+          </div>
         )}
-        {currentScreen === "game" && (
-          <GameScreen
-            onComplete={handleGameScreenComplete}
-            setPromptId={setPromptId}
-            setDrawingUrl={setDrawingUrl}
-            setImagePrompt={setImagePrompt}
-            isPlayToEarn={isPlayToEarn}
-            depositAmount={depositAmount}
-            account={account}
-            setCreationData={setCreationData}
-          />
-        )}
-        {currentScreen === "match" && (
-          <MatchScreen
-            onComplete={handleMatchScreenComplete}
-            promptId={promptId}
-            imagePrompt={imagePrompt}
-            modelId={modelId}
-            drawingUrl={drawingUrl}
-            similarity={similarity}
-            setSimilarity={setSimilarity}
-            creationData={creationData}
-          />
+        {account && (
+          <>
+            {" "}
+            {currentScreen === "start" && (
+              <StartGameScreen
+                onComplete={handleStartGame}
+                setIsPlayToEarn={setIsPlayToEarn}
+                setDepositAmount={setDepositAmount}
+                depositAmount={depositAmount}
+              />
+            )}
+            {currentScreen === "game" && (
+              <GameScreen
+                onComplete={handleGameScreenComplete}
+                setPromptId={setPromptId}
+                setDrawingUrl={setDrawingUrl}
+                setImagePrompt={setImagePrompt}
+                isPlayToEarn={isPlayToEarn}
+                depositAmount={depositAmount}
+                account={account}
+                setCreationData={setCreationData}
+                setTimeTaken={setTimeTaken}
+              />
+            )}
+            {currentScreen === "match" && (
+              <MatchScreen
+                onComplete={handleMatchScreenComplete}
+                promptId={promptId}
+                imagePrompt={imagePrompt}
+                modelId={modelId}
+                drawingUrl={drawingUrl}
+                similarity={similarity}
+                setSimilarity={setSimilarity}
+                creationData={creationData}
+                timeTaken={timeTaken}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

@@ -13,6 +13,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useMagicContext } from "../providers/MagicProvider";
 import { NFTMarketplaceAbi } from "@/lib/abi/NFTMarketplaceABI";
+import { useMinipay } from "../providers/MinipayProvider";
+import { createDangoClient } from "@/lib/minipay";
+import { MintDialog } from "../game/MintDialog";
 
 export default function CreationCard({
   creation,
@@ -21,39 +24,77 @@ export default function CreationCard({
   creation: any;
   account: any;
 }) {
+  const { minipay } = useMinipay();
   const { web3 } = useMagicContext();
+
+  const [isListing, setIsListing] = React.useState(false);
+  const [isBuying, setIsBuying] = React.useState(false);
 
   const MarketplaceAddress = "0xa647c2a9032CAa06f721D79f0c05E1304cbfe0bC";
   const MintAddress = "0x6288541D44Cd7E575711213798dEA5d94417519B";
 
   async function buyNFT() {
-    if (!web3) throw new Error("Web3 not connected");
-    const fromAddress = (await web3.eth.getAccounts())[0];
+    setIsBuying(true);
+    if (minipay) {
+      const walletClient = createDangoClient();
 
-    const contract = new web3.eth.Contract(
-      NFTMarketplaceAbi,
-      MarketplaceAddress
-    );
+      const [address] = await walletClient.getAddresses();
 
-    const receipt = await contract.methods.buyNFT(MintAddress, 1).send({
-      from: fromAddress,
-    });
-    console.log("receipt", receipt);
+      await walletClient.writeContract({
+        address: MarketplaceAddress,
+        abi: NFTMarketplaceAbi,
+        functionName: "buyNFT",
+        args: [MintAddress, 1],
+        account: address,
+      });
+    } else if (web3) {
+      const fromAddress = (await web3.eth.getAccounts())[0];
+
+      const contract = new web3.eth.Contract(
+        NFTMarketplaceAbi,
+        MarketplaceAddress
+      );
+
+      const receipt = await contract.methods.buyNFT(MintAddress, 1).send({
+        from: fromAddress,
+      });
+      console.log("receipt", receipt);
+    } else {
+      throw new Error("No wallet provider found");
+    }
+    setIsBuying(false);
   }
 
   async function listNFT() {
-    if (!web3) throw new Error("Web3 not connected");
-    const fromAddress = (await web3.eth.getAccounts())[0];
+    setIsListing(true);
+    if (minipay) {
+      const walletClient = createDangoClient();
 
-    const contract = new web3.eth.Contract(
-      NFTMarketplaceAbi,
-      MarketplaceAddress
-    );
+      const [address] = await walletClient.getAddresses();
 
-    const receipt = await contract.methods.listNFT(MintAddress, 1, 1).send({
-      from: fromAddress,
-    });
-    console.log("receipt", receipt);
+      await walletClient.writeContract({
+        address: MarketplaceAddress,
+        abi: NFTMarketplaceAbi,
+        functionName: "listNFT",
+        args: [MintAddress, 1, 1],
+        account: address,
+      });
+    } else if (web3) {
+      const fromAddress = (await web3.eth.getAccounts())[0];
+
+      const contract = new web3.eth.Contract(
+        NFTMarketplaceAbi,
+        MarketplaceAddress
+      );
+
+      const receipt = await contract.methods.listNFT(MintAddress, 1, 1).send({
+        from: fromAddress,
+      });
+      console.log("receipt", receipt);
+    } else {
+      throw new Error("No wallet provider found");
+    }
+    setIsListing(false);
   }
 
   return (
@@ -61,13 +102,15 @@ export default function CreationCard({
       <Dialog>
         <DialogTrigger asChild>
           <Card>
-            <Image
-              src={creation.enhanced_image || creation.drawing_url}
-              width={180}
-              height={180}
-              alt={"game"}
-              className="aspect-[1] rounded-md m-1 lg:m-2"
-            />
+            <div className="w-full p-1 ">
+              <Image
+                src={creation.enhanced_image || creation.drawing_url}
+                width={200}
+                height={200}
+                alt={"game"}
+                className="aspect-[1] rounded-md border w-full"
+              />
+            </div>
 
             <div className="flex  m-2">
               <Avatar className="w-8 h-8">
@@ -135,25 +178,26 @@ export default function CreationCard({
                   Creation details
                 </p>
                 <p className="flex text-xs  px-2 mb-0.5 font-semibold">
-                  Score: {creation.score}
+                  Score: {creation.score?.toFixed(2)}{" "}
                   <Star className="w-3.5 h-3.5 ml-1 text-amber-500" />
                 </p>
                 <p className="text-xs  px-2 mb-0.5">
-                  Similarity: {creation.similarity}
+                  Similarity: {creation.similarity?.toFixed(2)}
                 </p>
                 <p className="text-xs  px-2 mb-0.5">
                   Time taken: {creation.time_taken} secs
                 </p>
                 <p className="text-xs  px-2 mb-0.5 font-semibold">
-                  Price: {creation.price} usdc
+                  Price: {creation.price} USDC
                 </p>
               </div>
               {creation.listed && creation.owner?._id !== account?._id && (
                 <Button
                   className="w-full mt-2 px-6 py-3 mx-2 "
                   onClick={buyNFT}
+                  disabled={isBuying}
                 >
-                  Buy NFT
+                  {isBuying ? "Buying NFT..." : "Buy NFT"}
                 </Button>
               )}
               {!creation.listed &&
@@ -162,14 +206,21 @@ export default function CreationCard({
                   <Button
                     className="w-full mt-2 px-6 py-3 mx-2 "
                     onClick={listNFT}
+                    disabled={isListing}
                   >
-                    List NFT
+                    {isListing ? "Listing NFT..." : "List NFT"}
                   </Button>
                 )}
               {!creation.minted && creation.owner?._id === account?._id && (
-                <Button className="w-full mt-2 px-6 py-3 mx-2 ">
-                  Mint creation as NFT
-                </Button>
+                <div className="flex justify-center w-full mt-2 mx-2">
+                  <MintDialog
+                    drawingUrl={creation.drawing_url}
+                    prompt={creation.prompt}
+                    creationData={creation}
+                    score={creation.score}
+                    similarity={creation.similarity}
+                  />
+                </div>
               )}
             </div>
           </div>

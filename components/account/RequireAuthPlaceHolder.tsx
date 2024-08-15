@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { User } from "@/models/User";
 import { useRouter } from "next/navigation";
 
-import ConnectButton from "@/components/account/ConnectButton";
-
 export default function RequireAuthPlaceholder() {
   const [account, setAccount] = useState<User | null>(null);
 

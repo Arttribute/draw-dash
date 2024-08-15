@@ -9,28 +9,28 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
 
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
-import { set } from "mongoose";
-import { createWalletClient, custom, getContract } from "viem";
-import { mainnet, holesky } from "viem/chains";
-import { ethers } from "ethers";
 import { DrawDashAbi } from "@/lib/abi/DrawDashNFTABI";
 import { useMinipay } from "../providers/MinipayProvider";
 import { useMagicContext } from "../providers/MagicProvider";
+import { createDangoClient } from "@/lib/minipay";
 
 export function MintDialog({
   drawingUrl,
   prompt,
   creationData,
+  score,
+  similarity,
 }: {
   drawingUrl: string;
   prompt: string;
   creationData: any;
+  score: number;
+  similarity: number;
 }) {
   const [promptId, setPromptId] = useState("");
   const [enhancedImage, setEnhancedImage] = useState("");
@@ -39,6 +39,8 @@ export function MintDialog({
   const [minting, setMinting] = useState(false);
   const [isMinted, setIsMinted] = useState(false);
   const [creationName, setCreationName] = useState("");
+
+  const router = useRouter();
 
   const { minipay } = useMinipay();
   const { web3 } = useMagicContext();
@@ -118,6 +120,8 @@ export function MintDialog({
       name: creationName,
       enhanced_image: enhancedImage_url,
       minted: true,
+      score: score,
+      similarity: similarity,
     };
     console.log("creationDataOnmint", creationData);
     console.log("detailsToUpdate", detailsToUpdate);
@@ -136,24 +140,17 @@ export function MintDialog({
     const tokenUri = "https://mosaicsnft.com/api/metadata/1";
 
     if (minipay) {
-      // TODO: Fix this... quite buggy
-      const walletClient = createWalletClient({
-        chain: mainnet,
-        transport: custom((window as any).ethereum!),
-      });
-
-      const contract = getContract({
-        address: MintAddress,
-        abi: DrawDashAbi,
-        client: {
-          wallet: walletClient,
-        },
-      });
+      const walletClient = createDangoClient();
 
       const [address] = await walletClient.getAddresses();
 
-      const hash = await contract.write.mintNFT([address, tokenUri]);
-      console.log("hash", hash);
+      await walletClient.writeContract({
+        address: MintAddress,
+        abi: DrawDashAbi,
+        functionName: "mintNFT",
+        args: [address, tokenUri],
+        account: address,
+      });
     } else if (web3) {
       const fromAddress = (await web3.eth.getAccounts())[0];
 
@@ -169,6 +166,7 @@ export function MintDialog({
     } else {
       throw new Error("No wallet provider found");
     }
+    router.push("/creations");
   }
 
   return (
@@ -186,24 +184,13 @@ export function MintDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="border p-1 rounded-xl">
-          {!enhancedImage && (
-            <Image
-              src={drawingUrl}
-              width={600}
-              height={600}
-              alt="User's Drawing"
-              className=" rounded-xl object-cover w-full aspect-[1]"
-            />
-          )}
-          {enhancedImage && (
-            <Image
-              src={enhancedImage}
-              width={600}
-              height={600}
-              alt="User's Drawing"
-              className=" rounded-xl object-cover w-full aspect-[1]"
-            />
-          )}
+          <Image
+            src={enhancedImage ? enhancedImage : drawingUrl}
+            width={600}
+            height={600}
+            alt="User's Drawing"
+            className=" rounded-xl object-cover w-full aspect-[1]"
+          />
         </div>
         <Input
           id="name"
