@@ -14,8 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { createWalletClient, custom, getContract } from "viem";
-import { mainnet, holesky } from "viem/chains";
-import { ethers } from "ethers";
+import { mainnet } from "viem/chains";
 import { DrawDashPlayToEarnAbi } from "@/lib/abi/DrawDashPlayToEarn";
 import { useMinipay } from "../providers/MinipayProvider";
 import { useMagicContext } from "../providers/MagicProvider";

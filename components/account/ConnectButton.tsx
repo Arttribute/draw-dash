@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useState } from "react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useMagicContext } from "@/components/providers/MagicProvider";
 import { useMinipay } from "@/components/providers/MinipayProvider";

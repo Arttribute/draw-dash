@@ -6,7 +6,6 @@ import DrawingCanvas from "../ui/drawingcanvas";
 import GameTimer from "./GameTimer";
 import axios from "axios";
 import MultiplierDisplay from "./MultiplierDisplay";
-import { set } from "mongoose";
 
 interface GameScreenProps {
   onComplete: () => void;
