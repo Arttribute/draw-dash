@@ -15,6 +15,7 @@ import { useMagicContext } from "../providers/MagicProvider";
 import { NFTMarketplaceAbi } from "@/lib/abi/NFTMarketplaceABI";
 import { useMinipay } from "../providers/MinipayProvider";
 import { createDangoClient } from "@/lib/minipay";
+import { MintDialog } from "../game/MintDialog";
 
 export default function CreationCard({
   creation,
@@ -177,17 +178,17 @@ export default function CreationCard({
                   Creation details
                 </p>
                 <p className="flex text-xs  px-2 mb-0.5 font-semibold">
-                  Score: {creation.score}
+                  Score: {creation.score?.toFixed(2)}{" "}
                   <Star className="w-3.5 h-3.5 ml-1 text-amber-500" />
                 </p>
                 <p className="text-xs  px-2 mb-0.5">
-                  Similarity: {creation.similarity}
+                  Similarity: {creation.similarity?.toFixed(2)}
                 </p>
                 <p className="text-xs  px-2 mb-0.5">
                   Time taken: {creation.time_taken} secs
                 </p>
                 <p className="text-xs  px-2 mb-0.5 font-semibold">
-                  Price: {creation.price} usdc
+                  Price: {creation.price} USDC
                 </p>
               </div>
               {creation.listed && creation.owner?._id !== account?._id && (
@@ -211,9 +212,15 @@ export default function CreationCard({
                   </Button>
                 )}
               {!creation.minted && creation.owner?._id === account?._id && (
-                <Button className="w-full mt-2 px-6 py-3 mx-2 ">
-                  Mint creation as NFT
-                </Button>
+                <div className="flex justify-center w-full mt-2 mx-2">
+                  <MintDialog
+                    drawingUrl={creation.drawing_url}
+                    prompt={creation.prompt}
+                    creationData={creation}
+                    score={creation.score}
+                    similarity={creation.similarity}
+                  />
+                </div>
               )}
             </div>
           </div>
