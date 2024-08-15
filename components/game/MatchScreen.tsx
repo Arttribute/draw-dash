@@ -1,9 +1,8 @@
 "use client";
-import React, { useState, useRef, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import ImageComparison from "../ui/imagecomparison";
 import { MintDialog } from "./MintDialog";
-import { Copy } from "lucide-react";
 
 import axios from "axios";
 
@@ -108,7 +107,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
         <div className="relative z-10">
           <div className="text-center mb-4">
             <p className="text-xl font-semibold text-gray-800">
-              Score: <span className="text-green-600">{score}</span>
+              Score: <span className="text-green-600">{score?.toFixed(2)}</span>
             </p>
           </div>
           <div className="flex items-center justify-center">

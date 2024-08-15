@@ -184,24 +184,13 @@ export function MintDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="border p-1 rounded-xl">
-          {!enhancedImage && (
-            <Image
-              src={drawingUrl}
-              width={600}
-              height={600}
-              alt="User's Drawing"
-              className=" rounded-xl object-cover w-full aspect-[1]"
-            />
-          )}
-          {enhancedImage && (
-            <Image
-              src={enhancedImage}
-              width={600}
-              height={600}
-              alt="User's Drawing"
-              className=" rounded-xl object-cover w-full aspect-[1]"
-            />
-          )}
+          <Image
+            src={enhancedImage ? enhancedImage : drawingUrl}
+            width={600}
+            height={600}
+            alt="User's Drawing"
+            className=" rounded-xl object-cover w-full aspect-[1]"
+          />
         </div>
         <Input
           id="name"
