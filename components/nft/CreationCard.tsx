@@ -16,6 +16,8 @@ import { NFTMarketplaceAbi } from "@/lib/abi/NFTMarketplaceABI";
 import { useMinipay } from "../providers/MinipayProvider";
 import { createDangoClient } from "@/lib/minipay";
 import { MintDialog } from "../game/MintDialog";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
 
 export default function CreationCard({
   creation,
@@ -29,6 +31,7 @@ export default function CreationCard({
 
   const [isListing, setIsListing] = React.useState(false);
   const [isBuying, setIsBuying] = React.useState(false);
+  const [price, sePrice] = React.useState(0);
 
   const MarketplaceAddress = "0xa647c2a9032CAa06f721D79f0c05E1304cbfe0bC";
   const MintAddress = "0x6288541D44Cd7E575711213798dEA5d94417519B";
@@ -87,14 +90,33 @@ export default function CreationCard({
         MarketplaceAddress
       );
 
+      console.log("Listing address:", fromAddress, "Listing price:", price);
       const receipt = await contract.methods.listNFT(MintAddress, 1, 1).send({
         from: fromAddress,
       });
+
+      const detailsToUpdate = {
+        listed: true,
+        price: price,
+      };
+      updateCreation(detailsToUpdate);
+
       console.log("receipt", receipt);
     } else {
       throw new Error("No wallet provider found");
     }
     setIsListing(false);
+  }
+
+  async function updateCreation(detailsToUpdate: any) {
+    const res = await axios.put(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/creations/creation`,
+      {
+        detailsToUpdate,
+      },
+      { params: { id: creation?._id } }
+    );
+    console.log("res", res);
   }
 
   return (
@@ -191,6 +213,7 @@ export default function CreationCard({
                   Price: {creation.price} USDC
                 </p>
               </div>
+
               {creation.listed && creation.owner?._id !== account?._id && (
                 <Button
                   className="w-full mt-2 px-6 py-3 mx-2 "
@@ -203,13 +226,21 @@ export default function CreationCard({
               {!creation.listed &&
                 creation.minted &&
                 creation.owner?._id === account?._id && (
-                  <Button
-                    className="w-full mt-2 px-6 py-3 mx-2 "
-                    onClick={listNFT}
-                    disabled={isListing}
-                  >
-                    {isListing ? "Listing NFT..." : "List NFT"}
-                  </Button>
+                  <div className="flex justify-center w-full mt-2 mx-2">
+                    <Input
+                      type="number"
+                      placeholder="Price in USD"
+                      className="w-full border rounded-md p-2 w-[120px]"
+                      onChange={(e) => sePrice(Number(e.target.value))}
+                    />
+                    <Button
+                      className="w-full px-6 py-3 mx-2 "
+                      onClick={listNFT}
+                      disabled={isListing}
+                    >
+                      {isListing ? "Listing NFT..." : "List NFT"}
+                    </Button>
+                  </div>
                 )}
               {!creation.minted && creation.owner?._id === account?._id && (
                 <div className="flex justify-center w-full mt-2 mx-2">
