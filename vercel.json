@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "app/play/**/*": {
+      "maxDuration": 30
+    }
+  }
+}
