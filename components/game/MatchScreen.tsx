@@ -103,7 +103,7 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
         queryImageURL,
         resImage.data.secure_url
       );
-      setSimilarity(imageSimilarity);
+      setSimilarity(imageSimilarity ? imageSimilarity : 0);
     } catch (error) {
       console.error("Error in API call:", error);
     } finally {
