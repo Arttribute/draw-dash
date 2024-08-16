@@ -1,11 +1,12 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import ImageComparison from "../ui/imagecomparison";
 import { MintDialog } from "./MintDialog";
 
 import axios from "axios";
 import LoadingCount from "./LoadingCount";
+import { compare } from "@/app/actions/compare";
 
 interface MatchScreenProps {
   onComplete: () => void;
@@ -33,9 +34,6 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
   const [generatedImage, setGeneratedImage] = useState("");
   const [loadingComparison, setLoadingComparison] = useState(false);
   const [score, setScore] = useState(10);
-
-  const worker = useRef<any>(null);
-  const [workerReady, setWorkerReady] = useState<boolean | null>(null);
 
   const handleMintButtonClick = () => {
     onComplete(); // Trigger the transition to the MintScreen
@@ -85,47 +83,6 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
     }
   }
 
-  useEffect(() => {
-    if (!worker.current) {
-      // Create the worker if it does not yet exist.
-      worker.current = new Worker(new URL("./worker.ts", import.meta.url), {
-        type: "module",
-      });
-    }
-
-    // Create a callback function for messages from the worker thread.
-    const onMessageReceived = (e: MessageEvent) => {
-      switch (e.data.status) {
-        case "initiate":
-          setWorkerReady(false);
-          break;
-        case "ready":
-          setWorkerReady(true);
-          break;
-        case "complete":
-          setSimilarity(e.data.output);
-          setLoadingComparison(false);
-          break;
-      }
-    };
-
-    // Attach the callback function as an event listener.
-    worker.current.addEventListener("message", onMessageReceived);
-
-    // Define a cleanup function for when the component is unmounted.
-    return () =>
-      worker.current.removeEventListener("message", onMessageReceived);
-  });
-
-  const compare = useCallback(
-    (links: { query_image: string; ans_image: string }) => {
-      if (worker.current) {
-        worker.current.postMessage(links);
-      }
-    },
-    []
-  );
-
   // query image is the drawing, ans image is the AI generated image
   async function compareImages(queryImageURL: string, ansImageURL: string) {
     setLoadingComparison(true);
@@ -142,12 +99,14 @@ const MatchScreen: React.FC<MatchScreenProps> = ({
       );
       console.log("AI image uploaded to cloudinary");
 
-      compare({
-        query_image: queryImageURL,
-        ans_image: resImage.data.secure_url,
-      });
+      const imageSimilarity = await compare(
+        queryImageURL,
+        resImage.data.secure_url
+      );
+      setSimilarity(imageSimilarity);
     } catch (error) {
       console.error("Error in API call:", error);
+    } finally {
       setLoadingComparison(false);
     }
   }
